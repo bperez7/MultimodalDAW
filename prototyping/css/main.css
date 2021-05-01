@@ -127,6 +127,17 @@ body { background: #555555 ; }
 	z-index:-1;
  }
 
+.knob1OnButton{
+    width: 50px;
+    height: 50px;
+    position: absolute;
+    top:700px;
+    left:425px;
+    background-color: cyan;
+
+    z-index:-2;
+}
+
 
 .miniCircle1{ 
 
@@ -164,6 +175,18 @@ body { background: #555555 ; }
 	border-radius: 5px;
 	z-index:0;
  }
+
+
+.knob2OnButton{
+    width: 50px;
+    height: 50px;
+    position: absolute;
+    top:700px;
+    left:575px;
+    background-color: cyan;
+
+    z-index:-2;
+}
 
   .circle3{ 
 

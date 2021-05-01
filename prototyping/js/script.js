@@ -91,11 +91,23 @@ var pinchSlide1 = false;
 var pinchSlide2 = false;
 var pinchSlide3 = false;
 
+
+
 var handleElement1 = document.getElementById('handle1');
 var handleElement2 = document.getElementById('handle2');
 
 var knobElement1 = document.getElementById('knob1');
 var knobElement2 = document.getElementById('knob2');
+var knobElement3 = document.getElementById('knob3');
+
+var knob1Button = document.getElementById('knob1OnButton');
+var knob2Button = document.getElementById('knob2OnButton');
+var knob3Button = document.getElementById('knob3OnButton');
+
+var effect1On = false;
+var effect2On = false;
+var effect3On = false;
+
 
 var pinchKnob1 = false;
 var pinchKnob2 = false;
@@ -120,6 +132,7 @@ let volumeEvent = new CustomEvent('volumeChange');
 let filterEvent = new CustomEvent('filterChange');
 let panningEvent = new CustomEvent('panChange');
 let compressionEvent = new CustomEvent('compressionChange');
+let bitEvent = new CustomEvent('bitChange');
 
 let speechPlayEvent = new CustomEvent('speechPlay');
 let speechPauseEvent = new CustomEvent('speechPause');
@@ -127,9 +140,34 @@ let speechPauseEvent = new CustomEvent('speechPause');
 
 
 
+var screenTapGesture = false;
+var keyTapGesture = false;
 
 
 var controller = Leap.loop(function(frame){
+
+    screenTapGesture = false;
+    keyTapGesture = false;
+    if(frame.valid && frame.gestures.length > 0){
+        frame.gestures.forEach(function(gesture){
+            switch (gesture.type){
+                case "circle":
+                    console.log("Circle Gesture");
+                    break;
+                case "keyTap":
+                    console.log("Key Tap Gesture");
+                    keyTapGesture = gesture;
+                    break;
+                case "screenTap":
+                    console.log("Screen Tap Gesture");
+                    screenTapGesture = gesture;
+                    break;
+                case "swipe":
+                    console.log("Swipe Gesture");
+                    break;
+            }
+        });
+    }
 
     if(frame.hands.length > 0)
     {
@@ -442,6 +480,33 @@ var controller = Leap.loop(function(frame){
                 }
 
 
+        //overlapping Button
+
+        if (overlapRect('.knob1OnButton', '.cursor')) {
+
+            $('.knob1OnButton').css('opacity',.4)
+
+            if (!effect1On) {
+                if ((keyTapGesture!=false) || (screenTapGesture!=false)) {
+                    effect1On = true;
+                    $('.knob1OnButton').css('background-color', 'magenta');
+
+                }
+
+            }
+            //effect 1 already on
+            else {
+                if ((keyTapGesture!=false) || (screenTapGesture!=false)) {
+                    effect1On = false;
+                    $('.knob1OnButton').css('background-color', 'cyan');
+
+                }
+            }
+        }
+        else {
+            $('.knob1OnButton').css('opacity',1)
+        }
+
     // Knob 2 
 
         if (overlapRect('.circle2', '.cursor')) {
@@ -511,12 +576,44 @@ var controller = Leap.loop(function(frame){
 
 
 
+
+
         }
 
         //normal
         if (!pinchKnob2&& !overlapRect('.circle2', '.cursor'))
                 { $('.circle2').css('opacity', 1);  
                 }
+
+
+
+
+        //overlapping Button
+
+        if (overlapRect('.knob2OnButton', '.cursor')) {
+
+            $('.knob2OnButton').css('opacity',.4)
+
+            if (!effect2On) {
+                if ((keyTapGesture!=false) || (screenTapGesture!=false)) {
+                    effect2On = true;
+                    $('.knob2OnButton').css('background-color', 'magenta');
+
+                }
+
+            }
+            //effect 1 already on
+            else {
+                if ((keyTapGesture!=false) || (screenTapGesture!=false)) {
+                    effect2On = false;
+                    $('.knob2OnButton').css('background-color', 'cyan');
+
+                }
+            }
+        }
+        else {
+            $('.knob2OnButton').css('opacity',1)
+        }
 
 
 //Knob 3 
@@ -586,6 +683,8 @@ if (overlapRect('.circle3', '.cursor')) {
 
         }
 
+
+        knobElement3.dispatchEvent(bitEvent);
         //normal
         if (!pinchKnob3&& !overlapRect('.circle3', '.cursor'))
                 { $('.circle3').css('opacity', 1);  
@@ -598,46 +697,6 @@ if (overlapRect('.circle3', '.cursor')) {
 });
 
 
-function isOverlap(idOne,idTwo){
-        var objOne=$(idOne),
-            objTwo=$(idTwo),
-            offsetOne = objOne.offset(),
-            offsetTwo = objTwo.offset(),
-            topOne=offsetOne.top,
-            topTwo=offsetTwo.top,
-            leftOne=offsetOne.left,
-            leftTwo=offsetTwo.left,
-            widthOne = objOne.width(),
-            widthTwo = objTwo.width(),
-            heightOne = objOne.height(),
-            heightTwo = objTwo.height();
-        var leftTop = leftTwo > leftOne && leftTwo < leftOne+widthOne                  
-            && topTwo > topOne && topTwo < topOne+heightOne,             
-            rightTop = leftTwo+widthTwo > leftOne && leftTwo+widthTwo < leftOne+widthOne                  
-            && topTwo > topOne && topTwo < topOne+heightOne,             leftBottom = leftTwo > leftOne && leftTwo < leftOne+widthOne                 
-             && topTwo+heightTwo > topOne && topTwo+heightTwo < topOne+heightOne,             
-
-             rightBottom = leftTwo+widthTwo > leftOne && leftTwo+widthTwo < leftOne+widthOne                  
-             && topTwo+heightTwo > topOne && topTwo+heightTwo < topOne+heightOne;
-        return leftTop || rightTop || leftBottom || rightBottom;
-} 
-
-function overlapSlider1() { var overlap = !((parseInt($('.handle1').css('left')) + parseInt($('.handle1').css('width'))) < parseInt($('.cursor').css('left')) || 
-                parseInt($('.handle1').css('left')) > parseInt($('.cursor').css('left')) + parseInt($('.cursor').css('width')) || 
-                (parseInt($('.handle1').css('top') + parseInt($('.handle1').css('height')))) < parseInt($('.cursor').css('top')) || 
-                parseInt($('.handle1').css('top')) > parseInt($('.cursor').css('top')) + parseInt($('.handle1').css('height')))
-        return overlap 
-}
-
-
-function overlap(ob1, ob2) {
-    var overlapping = !((parseInt($(ob1).css('left')) + parseInt($(ob1).css('width'))) < parseInt($(ob2).css('left')) || 
-                parseInt($(ob1).css('left')) > parseInt($(ob2).css('left')) + parseInt($(ob2).css('width')) || 
-                (parseInt($(ob1).css('top') + parseInt($(ob1).css('height')))) < parseInt($(ob2).css('top')) || 
-                parseInt($(ob1).css('top')) > parseInt($(ob2).css('top')) + parseInt($(ob2).css('height')))
-    return overlapping
-
-}
 
 
 
@@ -656,27 +715,6 @@ function overlapRect(obj1, obj2) {
 }
 
 
-
-
-var overlappingtest1 = (parseInt($('.handle1').css('right')) < parseInt($('.cursor').css('left')))
-
-
-
-function rotateImage(degree, imageName) {
-    $(imageName).animate({
-        transform: degree,
-        fill: 'forward'
-        }, {
-            step: function(now, fx) {
-                $(this).css({
-                    '-webkit-transform': 'rotate(' + now + 'deg)',
-                    '-moz-transform': 'rotate(' + now + 'deg)',
-                    'transform': 'rotate(' + now + 'deg)',
-                    
-                    });
-                }
-            });
-        }
 
 
 function angleValue(knobIndex) {
@@ -728,6 +766,17 @@ function getCompressionReductionValue() {
     return newCompressionReductionValue;
 }
 
+function bitValue() {
+    if (knobAngle3>3) {
+        return 16
+    }
+    else if (knobAngle3<-3) {
+        return 0
+    }
+    return Math.round((8/3)*knobAngle3+3);
+
+}
+
 
 
 
@@ -745,6 +794,30 @@ function getCompressionReductionValue() {
 
 //Audio Logic
 
+var bufferSize = 4096;
+function bitCrusherEffect(context, numBits) {
+    var node = context.createScriptProcessor(bufferSize, 1, 1);
+    node.bits = numBits; // between 1 and 16
+    node.normfreq = 0.1; // between 0.0 and 1.0
+    var step = Math.pow(1/2, node.bits);
+    var phaser = 0;
+    var last = 0;
+    node.onaudioprocess = function(e) {
+        var input = e.inputBuffer.getChannelData(0);
+        var output = e.outputBuffer.getChannelData(0);
+        for (var i = 0; i < bufferSize; i++) {
+            phaser += node.normfreq;
+            if (phaser >= 1.0) {
+                phaser -= 1.0;
+                last = step * Math.floor(input[i] / step + 0.5);
+            }
+            output[i] = last;
+        }
+    };
+    return node;
+}
+
+
 var sineaOn = false;
 var sinea = false;
 
@@ -753,6 +826,7 @@ var filterM83;
 var pannerOptions;
 var panner;
 var compressor;
+var bitNode;
 
 
 var sourcem83 = false;
@@ -760,6 +834,14 @@ sineButton = document.getElementById('playButton1');
 var m83Ctx = false;
 m83Button = document.querySelector('audio');
 m83Button.crossOrigin = "anonymous";
+
+
+
+var sinea;
+var volumeSinea;
+
+
+
 
 
 function audioPlayListener() {
@@ -776,21 +858,58 @@ function audioPlayListener() {
 
 
 
+
         filterM83 = m83Ctx.createBiquadFilter();
         pannerOptions = { pan: 0 };
         panner = new StereoPannerNode(m83Ctx, pannerOptions);
         compressor = m83Ctx.createDynamicsCompressor();
+
+
+
+        sinea = m83Ctx.createOscillator();
+        volumeSinea = m83Ctx.createGain();
+        volumeSinea.gain.value = 0;
+        sinea.frequency.value = 440;
+        sinea.type = "sine";
+
+
+        sinea.connect(volumeSinea);
+        sinea.start();
+
+        bitNode = bitCrusherEffect(m83Ctx, bitValue());
+       // volumeSinea.connect(m83Ctx.destination);
+
+
+
+
+        //filterA.connect(audioCtx.destination);
+
+        // async function createReverb() {
+        //     let convolver = audioCtx.createConvolver();
+        //
+        //     // load impulse response from file
+        //     let response     = await fetch("path/to/impulse-response.wav");
+        //     let arraybuffer  = await response.arrayBuffer();
+        //     convolver.buffer = await audioCtx.decodeAudioData(arraybuffer);
+        //
+        //     return convolver;
+        // }
+
+
+        // let reverb = await createReverb();
+
+// someOtherAudioNode -> reverb -> destination
+      //  someOtherAudioNode.connect(reverb);
+      //  reverb.connect(audioCtx.destination);
+
     }
 
 
     // Create a gain node
 
-
-
-
-
     compressor.threshold.value = -50;
     compressor.knee.value = 40;
+
 
 
     filterM83.frequency.value = 10000;
@@ -816,21 +935,122 @@ function audioPlayListener() {
 
     })
 
+    knobElement3.addEventListener('bitChange', ()=>{
+        console.log(bitValue());
+        bitNode.bits = bitValue();
 
 
 
-    sourcem83.connect(filterM83);
-    filterM83.connect(panner);
-    panner.connect(compressor);
-    compressor.connect(gainNode);
+
+    })
 
 
-    gainNode.connect(m83Ctx.destination);
+
+    if (effect1On && effect2On && effect3On) {
+        sourcem83.connect(filterM83);
+        filterM83.connect(panner);
+        panner.connect(gainNode);
+       // compressor.connect(gainNode);
+
+        gainNode.connect(bitNode);
+        bitNode.connect(m83Ctx.destination);
+
+        //sinea
+        volumeSinea.connect(m83Ctx.destination);
+
+    }
+
+    if (!effect1On && effect2On && effect3On) {
+        sourcem83.connect(panner);
+
+        panner.connect(gainNode);
+        // compressor.connect(gainNode);
+
+        gainNode.connect(bitNode);
+        bitNode.connect(m83Ctx.destination);
+
+        //sinea
+        volumeSinea.connect(m83Ctx.destination);
+
+    }
+
+    if (!effect1On && !effect2On && effect3On) {
+        sourcem83.connect(gainNode);
+
+        gainNode.connect(bitNode);
+        bitNode.connect(m83Ctx.destination);
+
+        //sinea
+        volumeSinea.connect(m83Ctx.destination);
+
+    }
+
+    if (!effect1On && !effect2On && !effect3On) {
+        sourcem83.connect(gainNode);
+
+       gainNode.connect(m83Ctx.destination);
+
+        volumeSinea.connect(m83Ctx.destination);
+
+    }
+
+    if (effect1On && !effect2On && effect3On) {
+        sourcem83.connect(filterM83);
+        filterM83.connect(gainNode);
+
+        // compressor.connect(gainNode);
+
+        gainNode.connect(bitNode);
+        bitNode.connect(m83Ctx.destination);
+
+        //sinea
+        volumeSinea.connect(m83Ctx.destination);
+
+    }
+
+    if (effect1On && !effect2On && !effect3On) {
+        sourcem83.connect(filterM83);
+        filterM83.connect(gainNode);
+
+        gainNode.connect(m83Ctx.destination);
+
+        //sinea
+        volumeSinea.connect(m83Ctx.destination);
+
+    }
+
+    if (effect1On && effect2On && !effect3On) {
+        sourcem83.connect(filterM83);
+        filterM83.connect(panner);
+        panner.connect(gainNode);
+
+        gainNode.connect(m83Ctx.destination);
+
+        //sinea
+        volumeSinea.connect(m83Ctx.destination);
+
+    }
+
+    if (!effect1On && effect2On && !effect3On) {
+        sourcem83.connect(panner);
+        panner.connect(gainNode);
+
+        gainNode.connect(m83Ctx.destination);
+        //sinea
+        volumeSinea.connect(m83Ctx.destination);
+
+    }
+
+
+
+
+
 
 }
 
 
 m83Button.addEventListener('play', audioPlayListener);
+m83Button.addEventListener('pause', otherTrackPauseListener);
 m83Button.addEventListener('speechPlay', speechPlayActivate);
 m83Button.addEventListener('speechPause', speechPauseActivate);
 
@@ -840,6 +1060,10 @@ function speechPlayActivate() {
 
 function speechPauseActivate() {
     m83Button.pause();
+}
+
+function otherTrackPauseListener() {
+    volumeSinea.disconnect(m83Ctx.destination);
 }
 
 
