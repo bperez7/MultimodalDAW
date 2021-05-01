@@ -1,5 +1,16 @@
 // variable to store HTML5 audio element
 
+//TODO
+// 1. Keyboard
+// 2. Voice commands for buttons
+// 3. Different shapes for keyboard
+// 4. Live response for buttons
+// 5. Size and spacing
+// 5. Labels
+// 6. Finish voice commands
+// 7. Improve calibration/smoothing
+// 8. Record option
+
 var CURSOR_SPEED_SCALING = .05;
 
 var SLIDER_SPEED_SCALING = .05;
@@ -123,12 +134,15 @@ var knobAngle3 = 0;
 
 
 var newVolume = 0;
+var newVolume2 = 0;
 var newCutoffFreq = 10000;
 var newPanValue = 0;
 
 var newCompressionReductionValue = 0;
 
 let volumeEvent = new CustomEvent('volumeChange');
+let volume2Event = new CustomEvent('volume2Change');
+
 let filterEvent = new CustomEvent('filterChange');
 let panningEvent = new CustomEvent('panChange');
 let compressionEvent = new CustomEvent('compressionChange');
@@ -325,15 +339,20 @@ var controller = Leap.loop(function(frame){
                 }
             }
 
+
+
                 //check release
                 if (hand.pinchStrength<.4) {
                     pinchSlide2 = false
                 }
-
+            var volumeDelta = (newTop-(VOLUME_MAX+VOLUME_OFFSET))*(-1/VOLUME_MAX);
+                //scale by 2 for sine waves
+            updateVolume2(volumeDelta/2);
+            handleElement2.dispatchEvent(volume2Event);
                 $('.handle2').css('background-color', 'blue');
 
-                updateCompressionReductionValue((newTop-200)*(-2/50));
-                handleElement2.dispatchEvent(compressionEvent);
+               // updateCompressionReductionValue((newTop-200)*(-2/50));
+              //  handleElement2.dispatchEvent(compressionEvent);
 
                 $('.handle2').css('top', newTop);
 
@@ -691,6 +710,34 @@ if (overlapRect('.circle3', '.cursor')) {
                 }
 
 
+        //overlapping Button
+
+        if (overlapRect('.knob3OnButton', '.cursor')) {
+
+            $('.knob3OnButton').css('opacity',.4)
+
+            if (!effect3On) {
+                if ((keyTapGesture!=false) || (screenTapGesture!=false)) {
+                    effect3On = true;
+                    $('.knob3OnButton').css('background-color', 'magenta');
+
+                }
+
+            }
+            //effect 3 already on
+            else {
+                if ((keyTapGesture!=false) || (screenTapGesture!=false)) {
+                    effect3On = false;
+                    $('.knob3OnButton').css('background-color', 'cyan');
+
+                }
+            }
+        }
+        else {
+            $('.knob3OnButton').css('opacity',1)
+        }
+
+
 
 
     }
@@ -736,8 +783,16 @@ function angleValue(knobIndex) {
 function updateVolume(value) {
     newVolume = value;
 }
+
+function updateVolume2(value) {
+    newVolume2 = value;
+}
 function newVolumeValue() {
     return newVolume;
+}
+
+function newVolume2Value() {
+    return newVolume2;
 }
 
 function updateFilter(value) {
@@ -920,8 +975,13 @@ function audioPlayListener() {
     })
 
     handleElement2.addEventListener('compressionChange', ()=> {
-        console.log(newCompressionReductionValue);
-        compressor.threshold.value = newCompressionReductionValue;
+        //console.log(newCompressionReductionValue);
+        //compressor.threshold.value = newCompressionReductionValue;
+    })
+    handleElement2.addEventListener('volume2Change', ()=> {
+        console.log(newVolume2Value());
+        volumeSinea.gain.value = newVolume2Value();
+        //compressor.threshold.value = newCompressionReductionValue;
     })
 
     knobElement1.addEventListener('filterChange', ()=>{
@@ -944,7 +1004,16 @@ function audioPlayListener() {
 
     })
 
+    sourcem83.connect(filterM83);
+    filterM83.connect(panner);
+    panner.connect(gainNode);
+    // compressor.connect(gainNode);
 
+    gainNode.connect(bitNode);
+    bitNode.connect(m83Ctx.destination);
+
+    //sinea
+    volumeSinea.connect(m83Ctx.destination);
 
     if (effect1On && effect2On && effect3On) {
         sourcem83.connect(filterM83);
@@ -961,6 +1030,8 @@ function audioPlayListener() {
     }
 
     if (!effect1On && effect2On && effect3On) {
+        sourcem83.disconnect(filterM83);
+        filterM83.disconnect(panner);
         sourcem83.connect(panner);
 
         panner.connect(gainNode);
@@ -975,6 +1046,8 @@ function audioPlayListener() {
     }
 
     if (!effect1On && !effect2On && effect3On) {
+        sourcem83.disconnect(filterM83);
+        filterM83.disconnect(panner);
         sourcem83.connect(gainNode);
 
         gainNode.connect(bitNode);
@@ -986,8 +1059,16 @@ function audioPlayListener() {
     }
 
     if (!effect1On && !effect2On && !effect3On) {
-        sourcem83.connect(gainNode);
+        console.log('all off');
+        sourcem83.disconnect(filterM83);
+        filterM83.disconnect(panner);
+        panner.disconnect(gainNode);
 
+
+        gainNode.disconnect(bitNode);
+        bitNode.disconnect(m83Ctx.destination);
+
+        sourcem83.connect(gainNode);
        gainNode.connect(m83Ctx.destination);
 
         volumeSinea.connect(m83Ctx.destination);
@@ -996,6 +1077,8 @@ function audioPlayListener() {
 
     if (effect1On && !effect2On && effect3On) {
         sourcem83.connect(filterM83);
+        filterM83.disconnect(panner);
+        panner.disconnect(gainNode);
         filterM83.connect(gainNode);
 
         // compressor.connect(gainNode);
@@ -1010,7 +1093,15 @@ function audioPlayListener() {
 
     if (effect1On && !effect2On && !effect3On) {
         sourcem83.connect(filterM83);
+
+        filterM83.disconnect(panner);
+        panner.disconnect(gainNode);
+
         filterM83.connect(gainNode);
+
+
+        gainNode.disconnect(bitNode);
+        bitNode.disconnect(m83Ctx.destination);
 
         gainNode.connect(m83Ctx.destination);
 
@@ -1021,19 +1112,33 @@ function audioPlayListener() {
 
     if (effect1On && effect2On && !effect3On) {
         sourcem83.connect(filterM83);
+
         filterM83.connect(panner);
         panner.connect(gainNode);
+
+        gainNode.disconnect(bitNode);
+        bitNode.disconnect(m83Ctx.destination);
 
         gainNode.connect(m83Ctx.destination);
 
         //sinea
+
         volumeSinea.connect(m83Ctx.destination);
 
     }
 
     if (!effect1On && effect2On && !effect3On) {
+        sourcem83.disconnect(filterM83);
+        filterM83.disconnect(panner);
+
         sourcem83.connect(panner);
+        panner.disconnect(gainNode);
+        gainNode.disconnect(bitNode);
+        bitNode.disconnect(m83Ctx.destination);
+
         panner.connect(gainNode);
+
+
 
         gainNode.connect(m83Ctx.destination);
         //sinea
