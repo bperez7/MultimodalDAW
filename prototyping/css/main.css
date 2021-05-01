@@ -1,0 +1,197 @@
+.cursor {
+	width: 20px;
+	height: 20px;
+	position: absolute;
+	top:400px;
+	left:500px;
+	background-color: purple;
+	border-radius: 10px;
+	z-index:1;
+}
+
+body { background: #555555 ; }
+
+
+.speechText{
+    height: 50px;
+    width: 300px;
+    background-color: magenta;
+    top: 750px;
+    left:50px;
+    position: fixed;
+    z-index: -1;
+
+}
+
+ .play1{
+
+    font-size: 3.0em;
+   
+    color: maroon;
+  }
+
+  .tape-controls-play {
+
+  	  background-color: #4CAF50; /* Green */
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+
+  }
+
+
+.slider1 {
+  height: 500px;
+  width: 50px;
+  background-color: peru;
+  top: 200px;
+  left:50;
+  position: fixed;
+  z-index: -1;
+}
+.handle1 {
+  height: 30px;
+  width: 40px;
+  background-color: #F00;
+
+  top: 300px;
+  left:55px;
+  position: fixed;
+  z-index: 0;
+
+}
+
+.slider2 {
+  height: 500px;
+  width: 50px;
+  background-color: peru;
+  top: 200px;
+  left:125;
+  position: fixed;
+  z-index: -1;
+}
+.handle2 {
+  height: 30px;
+  width: 40px;
+  background-color: #F00;
+
+  top: 300px;
+  left:130px;
+  position: fixed;
+  z-index: 0;
+
+}
+
+.slider3 {
+  height: 500px;
+  width: 50px;
+  background-color: peru;
+  top: 200px;
+  left:200;
+  position: fixed;
+  z-index: -1;
+}
+.handle3 {
+  height: 30px;
+  width: 40px;
+  background-color: #F00;
+
+  top: 300px;
+  left:205px;
+  position: fixed;
+  z-index: 0;
+
+}
+
+.knob1 {
+	top: 500px;
+	left: 200px;
+	position: fixed;
+	animation-fill-mode: forwards;
+	z-index: 0;
+}
+
+.circle1{ 
+
+	width: 100px;
+	height: 100px;
+	position: absolute;
+	top:500px;
+	left:400px;
+	background-color: black;
+	border-radius: 50px;
+	z-index:-1;
+ }
+
+
+.miniCircle1{ 
+
+	width: 10px;
+	height: 10px;
+	position: absolute;
+	top: 505px;
+	left: 445px;
+	background-color: grey;
+	border-radius: 5px;
+	z-index:0;
+ }
+
+ .circle2{ 
+
+	width: 100px;
+	height: 100px;
+	position: absolute;
+	top:500px;
+	left:550px;
+	background-color: black;
+	border-radius: 50px;
+	z-index:-1;
+ }
+
+
+.miniCircle2{ 
+
+	width: 10px;
+	height: 10px;
+	position: absolute;
+	top: 505px;
+	left: 595px;
+	background-color: grey;
+	border-radius: 5px;
+	z-index:0;
+ }
+
+  .circle3{ 
+
+	width: 100px;
+	height: 100px;
+	position: absolute;
+	top:500px;
+	left:700px;
+	background-color: black;
+	border-radius: 50px;
+	z-index:-1;
+ }
+
+
+.miniCircle3{ 
+
+	width: 10px;
+	height: 10px;
+	position: absolute;
+	top: 505px;
+	left: 745px;
+	background-color: grey;
+	border-radius: 5px;
+	z-index:0;
+ }
+
+
+
+
+
+
