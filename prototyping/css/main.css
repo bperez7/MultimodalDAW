@@ -14,12 +14,14 @@ body { background: #555555 ; }
 
 .speechText{
     height: 50px;
-    width: 300px;
+    width: 200px;
     background-color: magenta;
     top: 750px;
     left:50px;
     position: fixed;
     z-index: -1;
+    outline-color: black;
+    outline-style: solid;
 
 }
 
@@ -49,9 +51,13 @@ body { background: #555555 ; }
   width: 50px;
   background-color: peru;
   top: 200px;
-  left:50;
+  left:50px;
   position: fixed;
   z-index: -1;
+  outline-color: black;
+  outline-style: solid;
+
+
 }
 .handle1 {
   height: 30px;
@@ -62,6 +68,9 @@ body { background: #555555 ; }
   left:55px;
   position: fixed;
   z-index: 0;
+  outline-color: black;
+  outline-style: solid;
+
 
 }
 
@@ -73,6 +82,9 @@ body { background: #555555 ; }
   left:125;
   position: fixed;
   z-index: -1;
+  outline-color: black;
+  outline-style: solid;
+
 }
 .handle2 {
   height: 30px;
@@ -83,6 +95,8 @@ body { background: #555555 ; }
   left:130px;
   position: fixed;
   z-index: 0;
+  outline-color: black;
+  outline-style: solid;
 
 }
 
@@ -94,6 +108,10 @@ body { background: #555555 ; }
   left:200;
   position: fixed;
   z-index: -1;
+  outline-color: black;
+  outline-style: solid;
+
+
 }
 .handle3 {
   height: 30px;
@@ -104,7 +122,8 @@ body { background: #555555 ; }
   left:205px;
   position: fixed;
   z-index: 0;
-
+  outline-color: black;
+  outline-style: solid;
 }
 
 .knob1 {
@@ -120,22 +139,26 @@ body { background: #555555 ; }
 	width: 100px;
 	height: 100px;
 	position: absolute;
-	top:500px;
+	top:300px;
 	left:400px;
 	background-color: black;
 	border-radius: 50px;
 	z-index:-1;
+    border: 1px palegreen solid;
  }
 
 .knob1OnButton{
     width: 50px;
     height: 50px;
     position: absolute;
-    top:700px;
+    top:450px;
     left:425px;
     background-color: cyan;
 
     z-index:-2;
+
+    outline-color: black;
+    outline-style: solid;
 }
 
 
@@ -144,7 +167,7 @@ body { background: #555555 ; }
 	width: 10px;
 	height: 10px;
 	position: absolute;
-	top: 505px;
+	top: 305px;
 	left: 445px;
 	background-color: grey;
 	border-radius: 5px;
@@ -156,11 +179,13 @@ body { background: #555555 ; }
 	width: 100px;
 	height: 100px;
 	position: absolute;
-	top:500px;
+	top:300px;
 	left:550px;
 	background-color: black;
 	border-radius: 50px;
 	z-index:-1;
+
+    border: 1px palegreen solid;
  }
 
 
@@ -169,7 +194,7 @@ body { background: #555555 ; }
 	width: 10px;
 	height: 10px;
 	position: absolute;
-	top: 505px;
+	top: 305px;
 	left: 595px;
 	background-color: grey;
 	border-radius: 5px;
@@ -181,11 +206,13 @@ body { background: #555555 ; }
     width: 50px;
     height: 50px;
     position: absolute;
-    top:700px;
+    top:450px;
     left:575px;
     background-color: cyan;
 
     z-index:-2;
+    outline-color: black;
+    outline-style: solid;
 }
 
   .circle3{ 
@@ -193,11 +220,13 @@ body { background: #555555 ; }
 	width: 100px;
 	height: 100px;
 	position: absolute;
-	top:500px;
+	top:300px;
 	left:700px;
 	background-color: black;
 	border-radius: 50px;
 	z-index:-1;
+    border: 1px palegreen solid;
+
  }
 
 
@@ -206,7 +235,7 @@ body { background: #555555 ; }
 	width: 10px;
 	height: 10px;
 	position: absolute;
-	top: 505px;
+	top: 305px;
 	left: 745px;
 	background-color: grey;
 	border-radius: 5px;
@@ -218,12 +247,199 @@ body { background: #555555 ; }
     width: 50px;
     height: 50px;
     position: absolute;
-    top:700px;
+    top:450px;
     left:725px;
     background-color: cyan;
 
     z-index:-2;
+
+    outline-color: black;
+    outline-style: solid;
 }
+
+
+
+.c-key{
+
+    width: 100px;
+    height: 300px;
+    position: absolute;
+    top:650px;
+    left:400px;
+    background-color: white;
+    outline-color: black;
+    outline-style: solid;
+    z-index:-2;
+
+}
+.c-sharp-key{
+
+    width: 60px;
+    height: 200px;
+    position: absolute;
+    top:650px;
+    left:470px;
+    background-color: black;
+    outline-color: black;
+    outline-style: solid;
+    z-index:-1;
+
+}
+
+.d-key{
+
+    width: 100px;
+    height: 300px;
+    position: absolute;
+    top:650px;
+    left:500px;
+    background-color: white;
+    outline-color: black;
+    outline-style: solid;
+    z-index:-2;
+
+}
+
+.d-sharp-key{
+
+    width: 70px;
+    height: 200px;
+    position: absolute;
+    top:650px;
+    left:570px;
+    background-color: black;
+    outline-color: black;
+    outline-style: solid;
+    z-index:-1;
+
+}
+
+.e-key{
+
+    width: 100px;
+    height: 300px;
+    position: absolute;
+    top:650px;
+    left:600px;
+    background-color: white;
+    outline-color: black;
+    outline-style: solid;
+    z-index:-2;
+
+}
+
+.f-key{
+
+    width: 100px;
+    height: 300px;
+    position: absolute;
+    top:650px;
+    left:700px;
+    background-color: white;
+    outline-color: black;
+    outline-style: solid;
+    z-index:-2;
+
+}
+
+.f-sharp-key{
+
+    width: 70px;
+    height: 200px;
+    position: absolute;
+    top:650px;
+    left:770px;
+    background-color: black;
+    outline-color: black;
+    outline-style: solid;
+    z-index:-1;
+
+}
+
+.g-key{
+
+    width: 100px;
+    height: 300px;
+    position: absolute;
+    top:650px;
+    left:800px;
+    background-color: white;
+    outline-color: black;
+    outline-style: solid;
+    z-index:-2;
+
+}
+
+.g-sharp-key{
+
+    width: 70px;
+    height: 200px;
+    position: absolute;
+    top:650px;
+    left:870px;
+    background-color: black;
+    outline-color: black;
+    outline-style: solid;
+    z-index:-1;
+
+}
+
+.a-key{
+
+    width: 100px;
+    height: 300px;
+    position: absolute;
+    top:650px;
+    left:900px;
+    background-color: white;
+    outline-color: black;
+    outline-style: solid;
+    z-index:-2;
+
+}
+
+.a-sharp-key{
+
+    width: 70px;
+    height: 200px;
+    position: absolute;
+    top:650px;
+    left:970px;
+    background-color: black;
+    outline-color: black;
+    outline-style: solid;
+    z-index:-1;
+
+}
+
+.b-key{
+
+    width: 100px;
+    height: 300px;
+    position: absolute;
+    top:650px;
+    left:1000px;
+    background-color: white;
+    outline-color: black;
+    outline-style: solid;
+    z-index:-2;
+
+}
+
+.c2-key{
+
+    width: 100px;
+    height: 300px;
+    position: absolute;
+    top:650px;
+    left:1100px;
+    background-color: white;
+    outline-color: black;
+    outline-style: solid;
+    z-index:-2;
+
+}
+
 
 
 

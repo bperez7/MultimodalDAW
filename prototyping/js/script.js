@@ -3,13 +3,14 @@
 //TODO
 // 1. Keyboard
 // 2. Voice commands for buttons
-// 3. Different shapes for keyboard
+// 3. Different shapes for keyboard (voice command)
 // 4. Live response for buttons
 // 5. Size and spacing
 // 5. Labels
 // 6. Finish voice commands
 // 7. Improve calibration/smoothing
 // 8. Record option
+// 9. Upload personal file
 
 var CURSOR_SPEED_SCALING = .05;
 
@@ -33,17 +34,47 @@ var RIGHT_SIDE_OF_SCREEN = 1500
 var VOLUME_MAX = 500;
 var VOLUME_OFFSET = 200;
 
-var MINICIRCLE1OFFSET_TOP = 545;
+var MINICIRCLE1OFFSET_TOP = 345;
 var MINICIRCLE1OFFSET_LEFT = 445;
 var KNOB_RADIUS_OFFSET = 45;
 
-var MINICIRCLE2OFFSET_TOP = 545;
+var MINICIRCLE2OFFSET_TOP = 345;
 var MINICIRCLE2OFFSET_LEFT = 595;
 
-var MINICIRCLE3OFFSET_TOP = 545;
+var MINICIRCLE3OFFSET_TOP = 345;
 var MINICIRCLE3OFFSET_LEFT = 745;
 
 
+//speech variables
+
+var speechButton = false;
+var speechButtonActivated = false;
+
+//Keyboard notes
+var noteLetters = "abcdefg"
+var sharpLetters = "acdfg";
+var allNormalKeys = [];
+var allSharpKeys = [];
+
+
+
+
+for (var x = 0; x < noteLetters.length; x++)
+{
+    var c = noteLetters.charAt(x);
+    allNormalKeys.push(document.getElementById(c+ '-key'));
+
+}
+
+//don't forget second c
+allNormalKeys.push(document.getElementById('c2-key'));
+
+for (var x = 0; x < sharpLetters.length; x++)
+{
+    var c = sharpLetters.charAt(x);
+    allSharpKeys.push(document.getElementById(c+ '-sharp-key'));
+
+}
 
 
 
@@ -66,6 +97,8 @@ function setVolume(volume) {
    music.volume = volume;
    console.log(volume);
 }
+
+
 
 
 
@@ -150,6 +183,43 @@ let bitEvent = new CustomEvent('bitChange');
 
 let speechPlayEvent = new CustomEvent('speechPlay');
 let speechPauseEvent = new CustomEvent('speechPause');
+
+let pianoEvent = new CustomEvent('keyPress');
+let releaseEvent = new CustomEvent('keyRelease');
+
+//wave events
+let sineEvent = new CustomEvent('sineEvent');
+let squareEvent = new CustomEvent('squareEvent');
+let sawtoothEvent = new CustomEvent('sawtoothEvent');
+let triangleEvent = new CustomEvent('triangleEvent');
+
+
+
+
+
+var sineAConnected = false;
+
+
+var frequencyDict = {};
+
+frequencyDict['c-key'] = 261.63;
+frequencyDict['c-sharp-key'] = 277.18
+frequencyDict['d-key'] = 293.66;
+frequencyDict['d-sharp-key'] = 311.13;
+frequencyDict['e-key'] = 329.63;
+frequencyDict['f-key'] = 349.23;
+frequencyDict['f-sharp-key'] = 369.99;
+frequencyDict['g-key'] = 392;
+frequencyDict['g-sharp-key'] = 415.3;
+frequencyDict['a-key'] = 440;
+frequencyDict['a-sharp-key'] = 466.16;
+frequencyDict['b-key'] = 493.88;
+frequencyDict['c2-key'] = 523.25;
+
+// allNormalKeys.forEach((key), ()=> {
+//     keyID = key.getAttribute('id');
+//     frequencyDict[keyID]
+// })
 
 
 
@@ -506,18 +576,24 @@ var controller = Leap.loop(function(frame){
             $('.knob1OnButton').css('opacity',.4)
 
             if (!effect1On) {
-                if ((keyTapGesture!=false) || (screenTapGesture!=false)) {
+                if ((keyTapGesture!=false) || (screenTapGesture!=false) || speechButton) {
                     effect1On = true;
                     $('.knob1OnButton').css('background-color', 'magenta');
+                    speechButton = false;
+                    speechButtonActivated = true;
 
                 }
+
+
 
             }
             //effect 1 already on
             else {
-                if ((keyTapGesture!=false) || (screenTapGesture!=false)) {
+                if ((keyTapGesture!=false) || (screenTapGesture!=false || speechButton)) {
                     effect1On = false;
                     $('.knob1OnButton').css('background-color', 'cyan');
+                    speechButton = false;
+                    speechButtonActivated = true;
 
                 }
             }
@@ -614,18 +690,22 @@ var controller = Leap.loop(function(frame){
             $('.knob2OnButton').css('opacity',.4)
 
             if (!effect2On) {
-                if ((keyTapGesture!=false) || (screenTapGesture!=false)) {
+                if ((keyTapGesture!=false) || (screenTapGesture!=false) || speechButton) {
                     effect2On = true;
                     $('.knob2OnButton').css('background-color', 'magenta');
+                    speechButtonActivated = true;
+                    speechButton = false;
 
                 }
 
             }
             //effect 1 already on
             else {
-                if ((keyTapGesture!=false) || (screenTapGesture!=false)) {
+                if ((keyTapGesture!=false) || (screenTapGesture!=false) || speechButton) {
                     effect2On = false;
                     $('.knob2OnButton').css('background-color', 'cyan');
+                    speechButtonActivated = true;
+                    speechButton = false;
 
                 }
             }
@@ -717,18 +797,22 @@ if (overlapRect('.circle3', '.cursor')) {
             $('.knob3OnButton').css('opacity',.4)
 
             if (!effect3On) {
-                if ((keyTapGesture!=false) || (screenTapGesture!=false)) {
+                if ((keyTapGesture!=false) || (screenTapGesture!=false) || speechButton) {
                     effect3On = true;
                     $('.knob3OnButton').css('background-color', 'magenta');
+                    speechButtonActivated = true;
+                    speechButton = false;
 
                 }
 
             }
             //effect 3 already on
             else {
-                if ((keyTapGesture!=false) || (screenTapGesture!=false)) {
+                if ((keyTapGesture!=false) || (screenTapGesture!=false) || speechButton) {
                     effect3On = false;
                     $('.knob3OnButton').css('background-color', 'cyan');
+                    speechButtonActivated = true;
+                    speechButton = false;
 
                 }
             }
@@ -736,6 +820,57 @@ if (overlapRect('.circle3', '.cursor')) {
         else {
             $('.knob3OnButton').css('opacity',1)
         }
+
+
+
+
+
+        //Keyboard logic!
+
+        var nonePressed = true;
+        var blackPressed = false;
+
+        allSharpKeys.forEach((key, index)=> {
+            if (overlapRect('.cursor', '.' + key.getAttribute('id'))) {
+                $('.' + key.getAttribute('id')).css('opacity', .5);
+                nonePressed = false;
+                console.log('overlap black key');
+                key.dispatchEvent(pianoEvent);
+                blackPressed = true;
+            }
+
+            else {
+                $('.' + key.getAttribute('id')).css('opacity', 1);
+                key.dispatchEvent(releaseEvent);
+
+            }
+        })
+
+        allNormalKeys.forEach((key, index)=> {
+            if (!blackPressed) { //black keys take priority
+                if (overlapRect('.cursor', '.' + key.getAttribute('id'))) {
+                    $('.' + key.getAttribute('id')).css('opacity', .5);
+                    nonePressed = false;
+                    key.dispatchEvent(pianoEvent);
+                }
+
+                else {
+                    $('.' + key.getAttribute('id')).css('opacity', 1);
+                    key.dispatchEvent(releaseEvent);
+                }
+            }
+
+        })
+
+
+        if (nonePressed)
+            handleElement2.dispatchEvent(releaseEvent);
+
+
+
+
+
+
 
 
 
@@ -923,7 +1058,9 @@ function audioPlayListener() {
 
         sinea = m83Ctx.createOscillator();
         volumeSinea = m83Ctx.createGain();
+
         volumeSinea.gain.value = 0;
+        volumeSinea.connect(m83Ctx.destination);
         sinea.frequency.value = 440;
         sinea.type = "sine";
 
@@ -978,11 +1115,45 @@ function audioPlayListener() {
         //console.log(newCompressionReductionValue);
         //compressor.threshold.value = newCompressionReductionValue;
     })
+
+
+
+
     handleElement2.addEventListener('volume2Change', ()=> {
         console.log(newVolume2Value());
         volumeSinea.gain.value = newVolume2Value();
         //compressor.threshold.value = newCompressionReductionValue;
     })
+
+
+    //wave events
+
+    handleElement2.addEventListener('sineEvent', ()=> {
+        console.log('sine');
+        sinea.type = 'sine';
+        //compressor.threshold.value = newCompressionReductionValue;
+    })
+    handleElement2.addEventListener('squareEvent', ()=> {
+        console.log('square');
+        sinea.type = 'square';
+        //compressor.threshold.value = newCompressionReductionValue;
+    })
+
+    handleElement2.addEventListener('sawtoothEvent', ()=> {
+        console.log('sawtooth');
+        sinea.type = 'sawtooth';
+        //compressor.threshold.value = newCompressionReductionValue;
+    })
+
+    handleElement2.addEventListener('triangleEvent', ()=> {
+        console.log('triangle');
+        sinea.type = 'triangle';
+        //compressor.threshold.value = newCompressionReductionValue;
+    })
+
+
+
+
 
     knobElement1.addEventListener('filterChange', ()=>{
         console.log(newCutoffFreq);
@@ -998,11 +1169,48 @@ function audioPlayListener() {
     knobElement3.addEventListener('bitChange', ()=>{
         console.log(bitValue());
         bitNode.bits = bitValue();
+    });
+
+    allNormalKeys.forEach((key)=> {
+        key.addEventListener('keyPress', () => {
+            console.log('key ' + key.getAttribute('id'));
+            sinea.frequency.value = frequencyDict[key.getAttribute('id')];
+            volumeSinea.connect(m83Ctx.destination);
+            sineAConnected = true;
+        })
+    });
+    allSharpKeys.forEach((key)=>{
+        key.addEventListener('keyPress', ()=>{
+            console.log('key ' + key.getAttribute('id'));
+            sinea.frequency.value = frequencyDict[key.getAttribute('id')];
+            volumeSinea.connect(m83Ctx.destination);
+            sineAConnected = true;
+
+        })
+
+        // key.addEventListener('keyRelease', ()=> {
+        //     console.log('key ' + key.getAttribute('id'));
+        //    // volumeSinea.disconnect(m83Ctx.destination);
+        //     //sinea.frequency.value = 0;
+        // })
+    });
+
+    //when no keys are pressed
+    handleElement2.addEventListener('keyRelease', ()=> {
+        //console.log(newCompressionReductionValue);
+
+
+        if (sineAConnected) {
+            sineAConnected = false;
+            volumeSinea.disconnect(m83Ctx.destination);
+
+        }
+        //compressor.threshold.value = newCompressionReductionValue;
+    });
 
 
 
 
-    })
 
     sourcem83.connect(filterM83);
     filterM83.connect(panner);
@@ -1013,7 +1221,7 @@ function audioPlayListener() {
     bitNode.connect(m83Ctx.destination);
 
     //sinea
-    volumeSinea.connect(m83Ctx.destination);
+    //volumeSinea.connect(m83Ctx.destination);
 
     if (effect1On && effect2On && effect3On) {
         sourcem83.connect(filterM83);
@@ -1228,17 +1436,61 @@ var processSpeech = function(transcript) {
         }
 
     }
-    if (userSaid(transcript, ['pain','pan'])) {
-        console.log('pan');
-        if (userSaid(transcript, ['right'])) {
-            console.log('right');
-            speechPanUpdate("right");
-        }
-        else if (userSaid(transcript, ['left'])) {
+
+
+    //wave command
+    if (userSaid(transcript, ['square', 'Square'])) {
+        handleElement2.dispatchEvent(squareEvent);
+    }
+    if (userSaid(transcript, ['sine', 'sign', 'Sign'])) {
+        handleElement2.dispatchEvent(sineEvent);
+    }
+    if (userSaid(transcript, ['triangle', 'Triangle'])) {
+        handleElement2.dispatchEvent(triangleEvent);
+    }
+
+    if (userSaid(transcript, ['Sawtooth', 'sawtooth'])) {
+        handleElement2.dispatchEvent(sawtoothEvent);
+
+    }
+    // if (userSaid(transcript, ['pain','pan'])) {
+    //     console.log('pan');
+    //     if (userSaid(transcript, ['right'])) {
+    //         console.log('right');
+    //         speechPanUpdate("right");
+    //     }
+    //     else if (userSaid(transcript, ['left'])) {
+    //         console.log('left');
+    //         speechPanUpdate("left");
+    //     }
+    //
+    // }
+    if (userSaid(transcript, ['right'])) {
+                console.log('right');
+                speechPanUpdate("right");
+            }
+    else if (userSaid(transcript, ['left'])) {
             console.log('left');
             speechPanUpdate("left");
         }
 
+
+
+
+
+    if (userSaid(transcript, ['on', 'off'])) {
+        if (!speechButtonActivated)
+        speechButton = true;
+
+    }
+    // else if (userSaid(transcript, ['on'])) {
+    //
+    //     if (!speechButtonActivated)
+    // }
+
+    else {
+        speechButton = false;
+        speechButtonActivated = false;
     }
 
 
@@ -1261,6 +1513,10 @@ var processSpeech = function(transcript) {
 //console.log(processSpeech('hello'));
 
 //export processSpeech
+
+function turnOnButton1() {
+
+}
 
 
 function speechVolumeUpdate(direction = "up", scale = 50) {
