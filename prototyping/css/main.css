@@ -4,14 +4,17 @@
 	position: absolute;
 	top:400px;
 	left:500px;
-	background-color: purple;
+	background-color: hotpink;
 	border-radius: 10px;
+    border: 1px black solid;
 	z-index:1;
 }
 
-body { background: #555555 ; }
 
+body {
 
+    background-image: url("../imgs/red_wallpaper.jpg")
+}
 .speechText{
     height: 50px;
     width: 200px;
@@ -46,9 +49,21 @@ body { background: #555555 ; }
   }
 
 
+  .slider1label {
+      height: 45px;
+      width: 100px;
+      background-color: greenyellow;
+      top: 150px;
+      left:50px;
+      position: fixed;
+      z-index: -1;
+      outline-color: black;
+      outline-style: solid;
+  }
+
 .slider1 {
-  height: 500px;
-  width: 50px;
+  height: 520px;
+  width: 100px;
   background-color: peru;
   top: 200px;
   left:50px;
@@ -60,8 +75,8 @@ body { background: #555555 ; }
 
 }
 .handle1 {
-  height: 30px;
-  width: 40px;
+  height: 50px;
+  width: 90px;
   background-color: #F00;
 
   top: 300px;
@@ -75,24 +90,36 @@ body { background: #555555 ; }
 }
 
 .slider2 {
-  height: 500px;
-  width: 50px;
+  height: 520px;
+  width: 100px;
   background-color: peru;
   top: 200px;
-  left:125;
+  left:175px;
   position: fixed;
   z-index: -1;
   outline-color: black;
   outline-style: solid;
 
 }
+
+.slider2label {
+    height: 45px;
+    width: 100px;
+    background-color: greenyellow;
+    top: 150px;
+    left:175px;
+    position: fixed;
+    z-index: -1;
+    outline-color: black;
+    outline-style: solid;
+}
 .handle2 {
-  height: 30px;
-  width: 40px;
+  height: 50px;
+  width: 90px;
   background-color: #F00;
 
   top: 300px;
-  left:130px;
+  left:180px;
   position: fixed;
   z-index: 0;
   outline-color: black;
@@ -101,11 +128,11 @@ body { background: #555555 ; }
 }
 
 .slider3 {
-  height: 500px;
+  height: 520px;
   width: 50px;
   background-color: peru;
   top: 200px;
-  left:200;
+  left:200px;
   position: fixed;
   z-index: -1;
   outline-color: black;
@@ -136,23 +163,23 @@ body { background: #555555 ; }
 
 .circle1{ 
 
-	width: 100px;
-	height: 100px;
+	width: 200px;
+	height: 200px;
 	position: absolute;
-	top:300px;
-	left:400px;
+	top:200px;
+	left:350px;
 	background-color: black;
-	border-radius: 50px;
+	border-radius: 100px;
 	z-index:-1;
     border: 1px palegreen solid;
  }
 
 .knob1OnButton{
-    width: 50px;
-    height: 50px;
+    width: 100px;
+    height: 100px;
     position: absolute;
-    top:450px;
-    left:425px;
+    top:475px;
+    left:405px;
     background-color: cyan;
 
     z-index:-2;
@@ -164,25 +191,25 @@ body { background: #555555 ; }
 
 .miniCircle1{ 
 
-	width: 10px;
-	height: 10px;
+	width: 20px;
+	height: 20px;
 	position: absolute;
-	top: 305px;
-	left: 445px;
+	top: 205px;
+	left: 440px;
 	background-color: grey;
-	border-radius: 5px;
+	border-radius: 10px;
 	z-index:0;
  }
 
  .circle2{ 
 
-	width: 100px;
-	height: 100px;
+	width: 200px;
+	height: 200px;
 	position: absolute;
-	top:300px;
-	left:550px;
+	top:200px;
+	left:650px;
 	background-color: black;
-	border-radius: 50px;
+	border-radius: 100px;
 	z-index:-1;
 
     border: 1px palegreen solid;
@@ -191,23 +218,23 @@ body { background: #555555 ; }
 
 .miniCircle2{ 
 
-	width: 10px;
-	height: 10px;
+	width: 20px;
+	height: 20px;
 	position: absolute;
-	top: 305px;
-	left: 595px;
+	top: 205px;
+	left: 740px;
 	background-color: grey;
-	border-radius: 5px;
+	border-radius: 10px;
 	z-index:0;
  }
 
 
 .knob2OnButton{
-    width: 50px;
-    height: 50px;
+    width: 100px;
+    height: 100px;
     position: absolute;
-    top:450px;
-    left:575px;
+    top:475px;
+    left:705px;
     background-color: cyan;
 
     z-index:-2;
@@ -217,13 +244,13 @@ body { background: #555555 ; }
 
   .circle3{ 
 
-	width: 100px;
-	height: 100px;
+	width: 200px;
+	height: 200px;
 	position: absolute;
-	top:300px;
-	left:700px;
+	top:200px;
+	left:950px;
 	background-color: black;
-	border-radius: 50px;
+	border-radius: 100px;
 	z-index:-1;
     border: 1px palegreen solid;
 
@@ -232,23 +259,23 @@ body { background: #555555 ; }
 
 .miniCircle3{ 
 
-	width: 10px;
-	height: 10px;
+	width: 20px;
+	height: 20px;
 	position: absolute;
-	top: 305px;
-	left: 745px;
+	top: 205px;
+	left: 1045px;
 	background-color: grey;
-	border-radius: 5px;
+	border-radius: 10px;
 	z-index:0;
  }
 
 
 .knob3OnButton{
-    width: 50px;
-    height: 50px;
+    width: 100px;
+    height: 100px;
     position: absolute;
-    top:450px;
-    left:725px;
+    top:475px;
+    left:1005px;
     background-color: cyan;
 
     z-index:-2;

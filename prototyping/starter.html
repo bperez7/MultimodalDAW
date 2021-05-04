@@ -2,24 +2,29 @@
 <head> 
 	<title>Audio Player </title>
 	<link rel="stylesheet" href="css/main.css"> 
-</head> 
+</head>
 
 
-
-
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<input type="file" id="upload" />
+<audio id="audio_player" controls>
+    <source src="" id="src" />
+</audio>
+<!--
 <audio controls="controls" id="audio_player" crossorigin="anonymous">
   
   <source src="audio/m83.mp3" type="audio/mpeg" />
   Audio
 </audio>
 
+-->
 
 
-
-<!-- play button -->
+<!-- play button
 <div class="play1" id="playButton1">
   &#9654; 
 </div>
+-->
 
  <!-- Leap -->
 <!-- <script type="text/javascript" src="lib/leap-plugins.min.js"></script> -->
@@ -40,9 +45,6 @@
 
 
 <body>
-
-
-
 
 
 <div class = "cursor"></div>
@@ -72,15 +74,21 @@
 
  <div class="slider1" id = "slider1"></div>
  <div class="handle1" id = "handle1"></div>
-
+<div class="slider1label" id = "slider1label">
+ Track Volume
+</div>
 
 
  <div class = "slider2"></div>
  <div class = "handle2" id = "handle2"></div>
 
+<div class="slider2label" id = "slider2label">
+ Synth Volume
+</div>
+<!--
  <div class = "slider3"></div>
  <div class = "handle3"></div>
-
+-->
 
 <!-- <img class="knob1" src = "imgs/knob1.png"> --> 
 <div class="circle1" id ="knob1"></div>

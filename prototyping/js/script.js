@@ -1,16 +1,17 @@
 // variable to store HTML5 audio element
 
 //TODO
-// 1. Keyboard
-// 2. Voice commands for buttons
-// 3. Different shapes for keyboard (voice command)
+// 1. Keyboard :-)
+// 2. Voice commands for buttons done :-)
+// 3. Different shapes for keyboard (voice command) :-)
 // 4. Live response for buttons
-// 5. Size and spacing
+// 5. Size and spacing :-)
 // 5. Labels
 // 6. Finish voice commands
 // 7. Improve calibration/smoothing
 // 8. Record option
-// 9. Upload personal file
+// 9. Upload personal file :-)
+// 10. Reset buttons?
 
 var CURSOR_SPEED_SCALING = .05;
 
@@ -34,15 +35,15 @@ var RIGHT_SIDE_OF_SCREEN = 1500
 var VOLUME_MAX = 500;
 var VOLUME_OFFSET = 200;
 
-var MINICIRCLE1OFFSET_TOP = 345;
-var MINICIRCLE1OFFSET_LEFT = 445;
-var KNOB_RADIUS_OFFSET = 45;
+var MINICIRCLE1OFFSET_TOP = 290;
+var MINICIRCLE1OFFSET_LEFT = 440;
+var KNOB_RADIUS_OFFSET = 90;
 
-var MINICIRCLE2OFFSET_TOP = 345;
-var MINICIRCLE2OFFSET_LEFT = 595;
+var MINICIRCLE2OFFSET_TOP = 290;
+var MINICIRCLE2OFFSET_LEFT = 740;
 
-var MINICIRCLE3OFFSET_TOP = 345;
-var MINICIRCLE3OFFSET_LEFT = 745;
+var MINICIRCLE3OFFSET_TOP = 290;
+var MINICIRCLE3OFFSET_LEFT = 1040;
 
 
 //speech variables
@@ -77,6 +78,14 @@ for (var x = 0; x < sharpLetters.length; x++)
 }
 
 
+//music upload
+function handleFiles(event) {
+    var files = event.target.files;
+    $("#src").attr("src", URL.createObjectURL(files[0]));
+    document.getElementById("audio_player").load();
+}
+
+document.getElementById("upload").addEventListener("change", handleFiles, false);
 
 var music = document.getElementById('audio_player');
   
@@ -437,64 +446,64 @@ var controller = Leap.loop(function(frame){
 
 //slider 3      
 
-        if (overlapRect('.handle3', '.cursor')) {
-            $('.handle3').css('background-color', 'blue');
-
-
-            //check pinching 
-
-            if (hand.pinchStrength<.4) {
-                    pinchSlide3 = false;
-                }
-            else {
-                pinchSlide3 = true;
-            }
-        }
-
-        if (pinchSlide3) {
-
-
-            var newTop;
-
-            if (velocity[1] > 0) {
-                var currentTop = parseInt($('.handle3').css('top'));
-                var delta_y = velocity[1]*SLIDER_SPEED_SCALING;
-
-                //newTop = currentTop+delta_y;
-                if (currentTop<205){//upper limit
-                    newTop = 205;
-                }
-                else {
-                    newTop = currentTop-delta_y;
-                }
-
-            }
-            else {
-                var currentTop = parseInt($('.handle3').css('top'))
-                var delta_y = velocity[1]*SLIDER_SPEED_SCALING;
-
-                if (currentTop>650) {//height of bar, limit
-                    newTop = 650;
-                }
-                else {
-                    newTop = currentTop-delta_y;
-                }
-            }
-
-                //check release
-                if (hand.pinchStrength<.4) {
-                    pinchSlide3 = false
-                }
-
-                $('.handle3').css('background-color', 'blue');
-
-                $('.handle3').css('top', newTop);
-
-        }
-
-        if (!overlapRect('.handle3', '.cursor') && !pinchSlide3) {
-            $('.handle3').css('background-color', 'red');
-        }
+        // if (overlapRect('.handle3', '.cursor')) {
+        //     $('.handle3').css('background-color', 'blue');
+        //
+        //
+        //     //check pinching
+        //
+        //     if (hand.pinchStrength<.4) {
+        //             pinchSlide3 = false;
+        //         }
+        //     else {
+        //         pinchSlide3 = true;
+        //     }
+        // }
+        //
+        // if (pinchSlide3) {
+        //
+        //
+        //     var newTop;
+        //
+        //     if (velocity[1] > 0) {
+        //         var currentTop = parseInt($('.handle3').css('top'));
+        //         var delta_y = velocity[1]*SLIDER_SPEED_SCALING;
+        //
+        //         //newTop = currentTop+delta_y;
+        //         if (currentTop<205){//upper limit
+        //             newTop = 205;
+        //         }
+        //         else {
+        //             newTop = currentTop-delta_y;
+        //         }
+        //
+        //     }
+        //     else {
+        //         var currentTop = parseInt($('.handle3').css('top'))
+        //         var delta_y = velocity[1]*SLIDER_SPEED_SCALING;
+        //
+        //         if (currentTop>650) {//height of bar, limit
+        //             newTop = 650;
+        //         }
+        //         else {
+        //             newTop = currentTop-delta_y;
+        //         }
+        //     }
+        //
+        //         //check release
+        //         if (hand.pinchStrength<.4) {
+        //             pinchSlide3 = false
+        //         }
+        //
+        //         $('.handle3').css('background-color', 'blue');
+        //
+        //         $('.handle3').css('top', newTop);
+        //
+        // }
+        //
+        // if (!overlapRect('.handle3', '.cursor') && !pinchSlide3) {
+        //     $('.handle3').css('background-color', 'red');
+        // }
 
 // Knob 1 
 
