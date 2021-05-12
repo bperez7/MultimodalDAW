@@ -1,7 +1,7 @@
 .cursor {
 	width: 20px;
 	height: 20px;
-	position: absolute;
+	position: fixed;
 	top:400px;
 	left:500px;
 	background-color: hotpink;
@@ -10,11 +10,67 @@
 	z-index:1;
 }
 
+.cursor2 {
+    width: 20px;
+    height: 20px;
+    position: fixed;
+    top:400px;
+    left:300px;
+    background-color: lightblue;
+    border-radius: 10px;
+    border: 1px black solid;
+    z-index:1;
+
+}
+
+
+.legend {
+    height: 300px;
+    width: 180px;
+    background-color: greenyellow;
+    top: 150px;
+    left:1200px;
+    position: fixed;
+    z-index: -1;
+    outline-color: black;
+    outline-style: solid;
+    text-align: left;
+}
+
+
 
 body {
 
     background-image: url("../imgs/red_wallpaper.jpg")
 }
+
+
+.pianoLevel {
+    height: 50px;
+    width: 90px;
+    background-color: yellow;
+
+    top: 300px;
+    left:1500px;
+    position: fixed;
+    z-index: -1;
+    outline-color: grey;
+    outline-style: solid;
+}
+
+.reverbButton {
+    height: 50px;
+    width: 90px;
+    background-color: yellow;
+
+    top: 300px;
+    left:1500px;
+    position: fixed;
+    z-index: -1;
+    outline-color: grey;
+    outline-style: solid;
+}
+
 .speechText{
     height: 50px;
     width: 200px;
@@ -59,17 +115,18 @@ body {
       z-index: -1;
       outline-color: black;
       outline-style: solid;
+      text-align: center;
   }
 
 .slider1 {
   height: 520px;
   width: 100px;
-  background-color: peru;
+  background-color: black;
   top: 200px;
   left:50px;
   position: fixed;
   z-index: -1;
-  outline-color: black;
+  outline-color: limegreen;
   outline-style: solid;
 
 
@@ -83,7 +140,7 @@ body {
   left:55px;
   position: fixed;
   z-index: 0;
-  outline-color: black;
+  outline-color: grey;
   outline-style: solid;
 
 
@@ -92,13 +149,14 @@ body {
 .slider2 {
   height: 520px;
   width: 100px;
-  background-color: peru;
+  background-color: black;
   top: 200px;
   left:175px;
   position: fixed;
   z-index: -1;
-  outline-color: black;
+  outline-color: limegreen;
   outline-style: solid;
+
 
 }
 
@@ -112,6 +170,7 @@ body {
     z-index: -1;
     outline-color: black;
     outline-style: solid;
+    text-align: center;
 }
 .handle2 {
   height: 50px;
@@ -122,7 +181,7 @@ body {
   left:180px;
   position: fixed;
   z-index: 0;
-  outline-color: black;
+  outline-color: grey;
   outline-style: solid;
 
 }
@@ -161,11 +220,13 @@ body {
 	z-index: 0;
 }
 
+
+
 .circle1{ 
 
 	width: 200px;
 	height: 200px;
-	position: absolute;
+	position: fixed;
 	top:200px;
 	left:350px;
 	background-color: black;
@@ -174,10 +235,23 @@ body {
     border: 1px palegreen solid;
  }
 
+.knob1label {
+    height: 45px;
+    width: 100px;
+    background-color: greenyellow;
+    top: 140px;
+    left:400px;
+    position: fixed;
+    z-index: -1;
+    outline-color: black;
+    outline-style: solid;
+    text-align: center;
+}
+
 .knob1OnButton{
     width: 100px;
     height: 100px;
-    position: absolute;
+    position: fixed;
     top:475px;
     left:405px;
     background-color: cyan;
@@ -193,7 +267,7 @@ body {
 
 	width: 20px;
 	height: 20px;
-	position: absolute;
+	position: fixed;
 	top: 205px;
 	left: 440px;
 	background-color: grey;
@@ -205,7 +279,7 @@ body {
 
 	width: 200px;
 	height: 200px;
-	position: absolute;
+	position: fixed;
 	top:200px;
 	left:650px;
 	background-color: black;
@@ -215,12 +289,24 @@ body {
     border: 1px palegreen solid;
  }
 
+.knob2label {
+    height: 45px;
+    width: 100px;
+    background-color: greenyellow;
+    top: 140px;
+    left:700px;
+    position: fixed;
+    z-index: -1;
+    outline-color: black;
+    outline-style: solid;
+    text-align: center;
+}
 
 .miniCircle2{ 
 
 	width: 20px;
 	height: 20px;
-	position: absolute;
+	position: fixed;
 	top: 205px;
 	left: 740px;
 	background-color: grey;
@@ -232,7 +318,7 @@ body {
 .knob2OnButton{
     width: 100px;
     height: 100px;
-    position: absolute;
+    position: fixed;
     top:475px;
     left:705px;
     background-color: cyan;
@@ -246,7 +332,7 @@ body {
 
 	width: 200px;
 	height: 200px;
-	position: absolute;
+	position: fixed;
 	top:200px;
 	left:950px;
 	background-color: black;
@@ -255,13 +341,24 @@ body {
     border: 1px palegreen solid;
 
  }
-
+.knob3label {
+    height: 45px;
+    width: 100px;
+    background-color: greenyellow;
+    top: 140px;
+    left:1000px;
+    position: fixed;
+    z-index: -1;
+    outline-color: black;
+    outline-style: solid;
+    text-align: center;
+}
 
 .miniCircle3{ 
 
 	width: 20px;
 	height: 20px;
-	position: absolute;
+	position: fixed;
 	top: 205px;
 	left: 1045px;
 	background-color: grey;
@@ -273,7 +370,7 @@ body {
 .knob3OnButton{
     width: 100px;
     height: 100px;
-    position: absolute;
+    position: fixed;
     top:475px;
     left:1005px;
     background-color: cyan;
@@ -290,7 +387,7 @@ body {
 
     width: 100px;
     height: 300px;
-    position: absolute;
+    position: fixed;
     top:650px;
     left:400px;
     background-color: white;
@@ -303,7 +400,7 @@ body {
 
     width: 60px;
     height: 200px;
-    position: absolute;
+    position: fixed;
     top:650px;
     left:470px;
     background-color: black;
@@ -317,7 +414,7 @@ body {
 
     width: 100px;
     height: 300px;
-    position: absolute;
+    position: fixed;
     top:650px;
     left:500px;
     background-color: white;
@@ -331,7 +428,7 @@ body {
 
     width: 70px;
     height: 200px;
-    position: absolute;
+    position: fixed;
     top:650px;
     left:570px;
     background-color: black;
@@ -345,7 +442,7 @@ body {
 
     width: 100px;
     height: 300px;
-    position: absolute;
+    position: fixed;
     top:650px;
     left:600px;
     background-color: white;
@@ -359,7 +456,7 @@ body {
 
     width: 100px;
     height: 300px;
-    position: absolute;
+    position: fixed;
     top:650px;
     left:700px;
     background-color: white;
@@ -373,7 +470,7 @@ body {
 
     width: 70px;
     height: 200px;
-    position: absolute;
+    position: fixed;
     top:650px;
     left:770px;
     background-color: black;
@@ -387,7 +484,7 @@ body {
 
     width: 100px;
     height: 300px;
-    position: absolute;
+    position: fixed;
     top:650px;
     left:800px;
     background-color: white;
@@ -401,7 +498,7 @@ body {
 
     width: 70px;
     height: 200px;
-    position: absolute;
+    position: fixed;
     top:650px;
     left:870px;
     background-color: black;
@@ -415,7 +512,7 @@ body {
 
     width: 100px;
     height: 300px;
-    position: absolute;
+    position: fixed;
     top:650px;
     left:900px;
     background-color: white;
@@ -429,7 +526,7 @@ body {
 
     width: 70px;
     height: 200px;
-    position: absolute;
+    position: fixed;
     top:650px;
     left:970px;
     background-color: black;
@@ -443,7 +540,7 @@ body {
 
     width: 100px;
     height: 300px;
-    position: absolute;
+    position: fixed;
     top:650px;
     left:1000px;
     background-color: white;
@@ -457,7 +554,7 @@ body {
 
     width: 100px;
     height: 300px;
-    position: absolute;
+    position: fixed;
     top:650px;
     left:1100px;
     background-color: white;

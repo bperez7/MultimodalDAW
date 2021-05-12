@@ -41,19 +41,44 @@
 
 
  
-<h1 > Multimodal DAW V.0.7 </h1>
+<h1 > Multimodal DAW V.0.9 </h1>
 
 
 <body>
 
 
+<div class = "legend" id = "legend">
+ <strong>General Controls</strong>
+ <ul.c>
+
+ <li>Play</li>
+ <li>Pause</li>
+
+ </ul.c>
+ <strong>Effect Controls</strong>
+ <ul.a>
+
+  <li>Volume Up/Down</li>
+  <li>Filter Up/Down</li>
+  <li>Right/Left</li>
+  <li>Bit Up/Down</li>
+  <li>On/Off</li>
+ </ul.a>
+
+
+
+ <strong>Synth Shapes</strong>
+ <ul.b>
+  <li>Sine</li>
+  <li>Square</li>
+  <li>Triangle</li>
+  <li>Sawtooth</li>
+ </ul.b>
+
+</div>
+
+
 <div class = "cursor"></div>
-
-
-
-
-
-
 
 
 <!--
@@ -72,6 +97,7 @@
  
 </div>
 
+<!--<div class = "pianoLevel" id = "pianoLevel"> </div> -->
  <div class="slider1" id = "slider1"></div>
  <div class="handle1" id = "handle1"></div>
 <div class="slider1label" id = "slider1label">
@@ -94,14 +120,24 @@
 <div class="circle1" id ="knob1"></div>
 <div class="miniCircle1"></div>
 <div class="knob1OnButton" id = "knob1OnButton"></div>
-
+<div class="knob1label" id = "knob1label">
+ Filter
+</div>
 <div class="circle2" id = "knob2"></div>
 <div class="miniCircle2"></div>
 <div class="knob2OnButton" id = "knob2OnButton"></div>
+<div class="knob2label" id = "knob2label">
+ Panning
+</div>
 
 <div class="circle3" id="knob3"></div>
 <div class="miniCircle3"></div>
 <div class="knob3OnButton" id = "knob3OnButton"></div>
+<div class="knob3label" id = "knob3label">
+ Bit-Crusher
+</div>
+
+<div class="reverbButton" id = "reverbButton"></div>
 
 
 <div class = "c-key" id = "c-key"></div>

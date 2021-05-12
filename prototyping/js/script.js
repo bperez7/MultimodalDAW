@@ -6,28 +6,31 @@
 // 3. Different shapes for keyboard (voice command) :-)
 // 4. Live response for buttons
 // 5. Size and spacing :-)
-// 5. Labels
+// 5. Labels :-)
 // 6. Finish voice commands
 // 7. Improve calibration/smoothing
 // 8. Record option
 // 9. Upload personal file :-)
 // 10. Reset buttons?
+// 11. Legend :-)
+// 12. knob (don't move unless angle is above certain value)
+// 13. drum pads
 
 var CURSOR_SPEED_SCALING = .05;
 
 var SLIDER_SPEED_SCALING = .05;
 var KNOB_SPEED_SCALING = .03;
 
+var SMOOTHING_WINDOW_SIZE = 20;
 
+var HORIZONTAL_OFFSET = 500;
 
-var HORIZONTAL_OFFSET = 300;
+var VERTICAL_OFFSET = 900;
 
-var VERTICAL_OFFSET = 1000;
+var POSITION_SCALING_X = 6;
+var POSITION_SCALING_Y = 3;
 
-var POSITION_SCALING =7;
-
-
-var BOTTOM_OF_SCREEN = 800
+var BOTTOM_OF_SCREEN = 900
 var RIGHT_SIDE_OF_SCREEN = 1500
 
 
@@ -104,7 +107,7 @@ function playAudio() {
 
 function setVolume(volume) {
    music.volume = volume;
-   console.log(volume);
+
 }
 
 
@@ -129,6 +132,17 @@ function setVolume(volume) {
 
 
 
+var parameterAdjusting = false; //for only adjusting one parameter at a time
+var wasPinchSlide1 = false;
+var wasPinchSlide2 = false;
+var wasPinchKnob1 = false;
+var wasPinchKnob2 = false;
+var wasPinchKnob3 = false;
+
+
+var pressActivate1 = false;
+var pressActivate2 = false;
+var pressActivate3 = false;
 
 
 
@@ -146,6 +160,9 @@ var pinchSlide3 = false;
 
 
 
+
+var nonePressed = true;
+
 var handleElement1 = document.getElementById('handle1');
 var handleElement2 = document.getElementById('handle2');
 
@@ -160,6 +177,14 @@ var knob3Button = document.getElementById('knob3OnButton');
 var effect1On = false;
 var effect2On = false;
 var effect3On = false;
+
+var wasPressingButton1 = false;
+var wasPressingButton2 = false;
+var wasPressingButton3 = false;
+
+var button1StartTime = false;
+var button2StartTime = false;
+var button3StartTime = false;
 
 
 var pinchKnob1 = false;
@@ -179,6 +204,11 @@ var newVolume = 0;
 var newVolume2 = 0;
 var newCutoffFreq = 10000;
 var newPanValue = 0;
+
+var newBitValue = 0;
+
+var reverbOn = false;
+
 
 var newCompressionReductionValue = 0;
 
@@ -202,11 +232,23 @@ let squareEvent = new CustomEvent('squareEvent');
 let sawtoothEvent = new CustomEvent('sawtoothEvent');
 let triangleEvent = new CustomEvent('triangleEvent');
 
+let buttonPress = new CustomEvent("buttonPress");
+
 
 
 
 
 var sineAConnected = false;
+
+var smoothArrayX = Array(SMOOTHING_WINDOW_SIZE);
+var smoothArrayY = Array(SMOOTHING_WINDOW_SIZE);
+
+for (let i = 0; i<SMOOTHING_WINDOW_SIZE; i++ ) {
+    smoothArrayX[i] = 0;
+    smoothArrayY[i] = 0;
+
+}
+
 
 
 var frequencyDict = {};
@@ -235,7 +277,7 @@ frequencyDict['c2-key'] = 523.25;
 
 var screenTapGesture = false;
 var keyTapGesture = false;
-
+var indexPosition = false;
 
 var controller = Leap.loop(function(frame){
 
@@ -245,73 +287,258 @@ var controller = Leap.loop(function(frame){
         frame.gestures.forEach(function(gesture){
             switch (gesture.type){
                 case "circle":
-                    console.log("Circle Gesture");
+
                     break;
                 case "keyTap":
-                    console.log("Key Tap Gesture");
+
                     keyTapGesture = gesture;
                     break;
                 case "screenTap":
-                    console.log("Screen Tap Gesture");
+
                     screenTapGesture = gesture;
                     break;
                 case "swipe":
-                    console.log("Swipe Gesture");
+
                     break;
             }
         });
     }
 
-    if(frame.hands.length > 0)
+    var leftHand;
+    var rightHand;
+    var currentLevelTop;
+    var pianoPressed = false;
+
+    //TODO
+    // add left hand functionality
+    if (frame.hands.length > 0)
     {
-        //console.log('hey you')
-       // console.log(processSpeech('hello'));
+        // if (frame.hands.length>1) {
+        //     if (frame.hands[0].type=="left") {
+        //         leftHand = frame.hands[0];
+        //         rightHand = frame.hands[1];
+        //     }
+        //     else {
+        //         leftHand = frame.hands[1];
+        //         rightHand = frame.hands[0];
+        //
+        //     }
+        //
+        //     //left hand
+        //
+        //
+        //
+        //     var leftPosition = leftHand.palmPosition;
+        //     var leftVelocity = leftHand.palmVelocity;
+        //     var leftDirection = leftHand.direction;
+        //
+        //     var newLeftHandLeft = Math.round(leftPosition[0]*POSITION_SCALING);
+        //     var newLeftHandTop = Math.round(leftPosition[1]*POSITION_SCALING);
+        //
+        //     var cursorLeftVelocityX = leftVelocity[0];
+        //     var cursorLeftVelocityY = leftVelocity[1];
+        //
+        //     var currentLeftX = parseInt($('.cursor2').css('left'));
+        //     var currentLeftY = parseInt($('.cursor2').css('top'));
+        //
+        //     var newLeftX = currentLeftX + cursorLeftVelocityX*CURSOR_SPEED_SCALING;
+        //     var newLeftY = currentLeftY - cursorLeftVelocityY*CURSOR_SPEED_SCALING;
+        //
+        //
+        //     //BORDER CASES
+        //     if (newLeftX<0) {
+        //         newLeftX = 0;
+        //     }
+        //     if (newLeftX> RIGHT_SIDE_OF_SCREEN) {
+        //         newLeftX = RIGHT_SIDE_OF_SCREEN;
+        //     }
+        //     if (newLeftY<0) {
+        //         newLeftY = 0;
+        //     }
+        //     if (newLeftY>BOTTOM_OF_SCREEN) {
+        //         newLeftY = BOTTOM_OF_SCREEN;
+        //     }
+        //
+        //     //SET position
+        //     $('.cursor2').css('left', Math.round(newLeftX));
+        //     $('.cursor2').css('top', Math.round(newLeftY));
+        //
+        //
+        //     //right hand
+        //     var rightPosition = rightHand.palmPosition;
+        //     var rightVelocity = rightHand.palmVelocity;
+        //     var rightDirection = rightHand.direction;
+        //
+        //     var newRightHandLeft = Math.round(rightPosition[0]*POSITION_SCALING);
+        //     var newRightHandTop = Math.round(rightPosition[1]*POSITION_SCALING);
+        //
+        //     var cursorRightVelocityX = rightVelocity[0];
+        //     var cursorRightVelocityY = rightVelocity[1];
+        //
+        //     var currentRightX = parseInt($('.cursor').css('left'));
+        //     var currentRightY = parseInt($('.cursor').css('top'));
+        //
+        //     var newRightX = currentRightX + cursorRightVelocityX*CURSOR_SPEED_SCALING;
+        //     var newRightY = currentRightY - cursorRightVelocityY*CURSOR_SPEED_SCALING;
+        //
+        //
+        //     //BORDER CASES
+        //     if (newRightX<0) {
+        //         newRightX = 0;
+        //     }
+        //     if (newRightX> RIGHT_SIDE_OF_SCREEN) {
+        //         newRightX = RIGHT_SIDE_OF_SCREEN;
+        //     }
+        //     if (newRightY<0) {
+        //         newRightY = 0;
+        //     }
+        //     if (newRightY>BOTTOM_OF_SCREEN) {
+        //         newRightY = BOTTOM_OF_SCREEN;
+        //     }
+        //
+        //     //SET position
+        //     $('.cursor').css('left', Math.round(newRightX));
+        //     $('.cursor').css('top', Math.round(newRightY));
+        //
+        //
+        //     //temporary
+        //     var hand = rightHand;
+        //     var position = rightPosition;
+        //
+        // }
+       // else { // only one hand
+            var twoHands = false;
+            if (frame.hands.length>1) {
+                twoHands = true;
+                if (frame.hands[0].type=="left") {
+                    leftHand = frame.hands[0];
+                    rightHand = frame.hands[1];
+                    leftVelocity = frame.hands[0].palmVelocity;
+                    rightVelocity = frame.hands[1].palmVelocity;
+
+                }
+                else {
+                    leftHand = frame.hands[1];
+                    rightHand = frame.hands[0];
+                    leftVelocity = frame.hands[1].palmVelocity;
+                    rightVelocity = frame.hands[0].palmVelocity;
+                }
+            }
+            var hand = frame.hands[0]
+
+            var position = hand.palmPosition;
+            var velocity = hand.palmVelocity;
+            var direction = hand.direction;
+
+        //    var newLeft = Math.round(position[0]*POSITION_SCALING);
+         //   var newTop = Math.round(position[1]*POSITION_SCALING);
+
+            var cursorVelocityX = velocity[0];
+            var cursorVelocityY = velocity[1];
+
+            var currentX = parseInt($('.cursor').css('left'));
+            var currentY = parseInt($('.cursor').css('top'));
+
+            var newX = currentX + cursorVelocityX*CURSOR_SPEED_SCALING;
+            var newY = currentY - cursorVelocityY*CURSOR_SPEED_SCALING;
+
+            smoothArrayX = ([HORIZONTAL_OFFSET + (position[0]*POSITION_SCALING_X)]).concat(smoothArrayX.slice(0,SMOOTHING_WINDOW_SIZE-1));
+            smoothArrayY = ([VERTICAL_OFFSET - (position[1]*POSITION_SCALING_Y)]).concat(smoothArrayY.slice(0,SMOOTHING_WINDOW_SIZE-1))
 
 
-        var hand = frame.hands[0]
-        var position = hand.palmPosition;
-        var velocity = hand.palmVelocity;
-        var direction = hand.direction;
-
-        var newLeft = Math.round(position[0]*POSITION_SCALING);
-        var newTop = Math.round(position[1]*POSITION_SCALING);
-
-        var cursorVelocityX = velocity[0];
-        var cursorVelocityY = velocity[1];
-
-        var currentX = parseInt($('.cursor').css('left'));
-        var currentY = parseInt($('.cursor').css('top'));
-
-        var newX = currentX + cursorVelocityX*CURSOR_SPEED_SCALING;
-        var newY = currentY - cursorVelocityY*CURSOR_SPEED_SCALING;
+            var newSmoothXSum = smoothArrayX.reduce(function(a,b) {return a+b});
+            var newSmoothYSum = smoothArrayY.reduce(function(a,b) {return a+b});
 
 
-        //BORDER CASES
-        if (newX<0) {
-            newX = 0;
-        }
-        if (newX> RIGHT_SIDE_OF_SCREEN) {
-            newX = RIGHT_SIDE_OF_SCREEN;
-        }
-        if (newY<0) {
-            newY = 0;
-        }
-        if (newY>BOTTOM_OF_SCREEN) {
-            newY = BOTTOM_OF_SCREEN;
-        }
+           // newX = (newSmoothXSum/SMOOTHING_WINDOW_SIZE);
+           // newY = (newSmoothYSum/SMOOTHING_WINDOW_SIZE);
 
-        //SET position
-        $('.cursor').css('left', Math.round(newX));
-        $('.cursor').css('top', Math.round(newY));
 
+
+            //BORDER CASES
+            if (newX<0) {
+                newX = 0;
+            }
+            if (newX> RIGHT_SIDE_OF_SCREEN) {
+                newX = RIGHT_SIDE_OF_SCREEN;
+            }
+            if (newY<0) {
+                newY = 0;
+            }
+            if (newY>BOTTOM_OF_SCREEN) {
+                newY = BOTTOM_OF_SCREEN;
+            }
+
+            //SET position
+            $('.cursor').css('left', Math.round(newX));
+            $('.cursor').css('top', Math.round(newY));
+
+            // rightHand = hand;
+            // rightVelocity = velocity;
+
+
+    //    }
+
+
+
+        //piano level
+
+        indexPosition = hand.indexFinger.tipPosition[1];
+        // console.log(indexPosition);
+        // console.log('hand');
+        // console.log(hand.palmPosition[1]);
+
+
+        // if (twoHands) {
+        //
+        //     currentLevelTop = parseInt($('.pianoLevel').css('top'));
+        //     var delta_level = SLIDER_SPEED_SCALING*leftVelocity[1];
+        //     var newLevelTop = currentLevelTop - delta_level;
+        //
+        //     if ((currentLevelTop-delta_level)<200) {
+        //         newLevelTop = 200
+        //     }
+        //     else if ((currentLevelTop-delta_level)>700) {
+        //         newLevelTop = 700;
+        //     }
+        //     $('.pianoLevel').css('top', newLevelTop);
+
+            //key press logic
+            if (!pianoPressed) {
+                // if ((currentLevelTop<450)&&(newLevelTop>450)) {
+                //     pianoPressed = true;
+                //
+                // }
+                //if (newLevelTop>450) {
+                if (indexPosition<hand.palmPosition[1]) {
+
+                    pianoPressed =true;
+                }
+
+            }
+            else { //piano pressed
+                // if ((currentLevelTop>450)&&(newLevelTop<450)) {
+                //     pianoPressed = false;
+                // }
+               // if (newLevelTop<450) {
+                if (indexPosition>hand.palmPosition[1]) {
+                    pianoPressed =false;
+                }
+            }
+
+        // }
 
         //overlapping sliders
-
+        //1st slider
+        var slider1RightHand = true;
         if (overlapRect('.handle1', '.cursor')) {
             $('.handle1').css('background-color', 'blue');
-            console.log('overlap');
 
-            //check pinching 
+
+
+
+
+            //check pinching
 
             if (hand.pinchStrength<.4) {
                     pinchSlide1 = false;
@@ -321,9 +548,11 @@ var controller = Leap.loop(function(frame){
             }
         }
 
-        if (pinchSlide1) {
+        if (pinchSlide1 && (!otherControlOn(1))) {
+
+
                 var newTop;
-                
+
                 if (velocity[1] > 0) {
                     var currentTop = parseInt($('.handle1').css('top'));
                     var delta_y = velocity[1]*SLIDER_SPEED_SCALING;
@@ -335,7 +564,7 @@ var controller = Leap.loop(function(frame){
                     else {
                         newTop = currentTop-delta_y;
                     }
-   
+
                 }
                 else {
                     var currentTop = parseInt($('.handle1').css('top'))
@@ -362,23 +591,41 @@ var controller = Leap.loop(function(frame){
              //   setVolume(newVolume);
                 $('.handle1').css('top', newTop);
 
+                $('.cursor').css('top', newTop + 15);  //lock onto slider
+                $('.cursor').css('left', 90);
+
 
                 handleElement1.dispatchEvent(volumeEvent);
 
+                wasPinchSlide1 = true;
+                parameterAdjusting = true;
+
         }
 
-        if (!overlapRect('.handle1', '.cursor') && !pinchSlide1) {
+        if (!pinchSlide1 && wasPinchSlide1) {
+            parameterAdjusting = false;
+        }
+
+        if (!overlapRect('.handle1', '.cursor')) {
             $('.handle1').css('background-color', 'red');
+
+
         }
 
-        //slider 2      
 
 
+        //slider 2
+
+        var slider2RightHand = true;
         if (overlapRect('.handle2', '.cursor')) {
             $('.handle2').css('background-color', 'blue');
 
 
-            //check pinching 
+
+
+
+
+            //check pinching
 
             if (hand.pinchStrength<.4) {
                     pinchSlide2 = false;
@@ -388,9 +635,11 @@ var controller = Leap.loop(function(frame){
             }
         }
 
-        if (pinchSlide2) {
+        if (pinchSlide2 && (!otherControlOn(2))) {
 
             var newTop;
+            parameterAdjusting = true;
+            wasPinchSlide2 = true;
 
             if (velocity[1] > 0) {
                 var currentTop = parseInt($('.handle2').css('top'));
@@ -435,6 +684,16 @@ var controller = Leap.loop(function(frame){
 
                 $('.handle2').css('top', newTop);
 
+                $('.cursor').css('top', newTop + 15);  //lock onto slider
+                $('.cursor').css('left', 215);
+
+
+
+
+        }
+
+        if (!pinchSlide2 && wasPinchSlide2) {
+            parameterAdjusting = false;
         }
 
         if (!overlapRect('.handle2', '.cursor') && !pinchSlide2) {
@@ -444,7 +703,7 @@ var controller = Leap.loop(function(frame){
 
 
 
-//slider 3      
+//slider 3
 
         // if (overlapRect('.handle3', '.cursor')) {
         //     $('.handle3').css('background-color', 'blue');
@@ -505,7 +764,7 @@ var controller = Leap.loop(function(frame){
         //     $('.handle3').css('background-color', 'red');
         // }
 
-// Knob 1 
+// Knob 1
 
         if (overlapRect('.circle1', '.cursor')) {
 
@@ -521,18 +780,20 @@ var controller = Leap.loop(function(frame){
             }
         }
 
-        
-        
 
 
-        if (pinchKnob1 && !pinchKnob2 &&!knob2Highlight) {
+
+
+        if (pinchKnob1 && !otherControlOn(3)) {
 
             //get angle of rotation
+            wasPinchKnob1 = true;
+            parameterAdjusting = true;
 
             var angleLimit = 3.14/3
             var handAngle = hand.roll();
 
-            if (handAngle>0) {
+            if (handAngle>.2) {
 
                 if (handAngle<-angleLimit) {
                     knobAngle1=KNOB_SPEED_SCALING*handAngle;
@@ -542,7 +803,8 @@ var controller = Leap.loop(function(frame){
                 }
 
             }
-            else if (handAngle<0) {
+            else if (handAngle<-.5) {
+
 
                 if (handAngle>angleLimit) {
                 knobAngle1+=KNOB_SPEED_SCALING*handAngle;
@@ -564,6 +826,9 @@ var controller = Leap.loop(function(frame){
             $('.miniCircle1').css('top', MINICIRCLE1OFFSET_TOP + Math.round(KNOB_RADIUS_OFFSET*Math.sin(knobAngle1 - 3.14/2)));
             $('.circle1').css('opacity', 0.7);
 
+            $('.cursor').css('top', MINICIRCLE1OFFSET_TOP);  //lock onto slider
+            $('.cursor').css('left', MINICIRCLE1OFFSET_LEFT);
+
             if (hand.pinchStrength<.3) { //release
                 pinchKnob1 = false;
             }
@@ -572,9 +837,14 @@ var controller = Leap.loop(function(frame){
 
         }
 
+        if (!pinchKnob1 && wasPinchKnob1) {
+            parameterAdjusting = false;
+        }
+
+
         //normal
         if (!pinchKnob1&& !overlapRect('.circle1', '.cursor'))
-                { $('.circle1').css('opacity', 1);  
+                { $('.circle1').css('opacity', 1);
                 }
 
 
@@ -585,12 +855,34 @@ var controller = Leap.loop(function(frame){
             $('.knob1OnButton').css('opacity',.4)
 
             if (!effect1On) {
-                if ((keyTapGesture!=false) || (screenTapGesture!=false) || speechButton) {
+                //if ((keyTapGesture!=false) || (screenTapGesture!=false) || speechButton || pressActivate1) {
+                if (speechButton||pressActivate1) {
                     effect1On = true;
+                    knob1Button.dispatchEvent(buttonPress);
                     $('.knob1OnButton').css('background-color', 'magenta');
                     speechButton = false;
                     speechButtonActivated = true;
+                    pressActivate1 = false;
+                    wasPressingButton1 = false;
 
+                }
+                //timed press
+                if (!wasPressingButton1) {
+                    if (indexPosition<position[1]) {
+                        wasPressingButton1 = true;
+                        button1StartTime = new Date();
+                    }
+                }
+                // pressing
+                else {
+                    if (indexPosition<position[1]) {
+                        //milliseconds
+                        console.log(new Date() - button1StartTime)
+                        if ((new Date() - button1StartTime)>(1000)) {
+                            pressActivate1 = true;
+                            wasPressingButton1 = false;
+                        }
+                    }
                 }
 
 
@@ -598,20 +890,43 @@ var controller = Leap.loop(function(frame){
             }
             //effect 1 already on
             else {
-                if ((keyTapGesture!=false) || (screenTapGesture!=false || speechButton)) {
+                //if ((keyTapGesture!=false) || (screenTapGesture!=false || speechButton||pressActivate1)) {
+                if (speechButton||pressActivate1) {
                     effect1On = false;
+                    knob1Button.dispatchEvent(buttonPress);
                     $('.knob1OnButton').css('background-color', 'cyan');
                     speechButton = false;
                     speechButtonActivated = true;
+                    wasPressingButton1 = false;
+                    pressActivate1 = false;
 
                 }
+
+                if (!wasPressingButton1) {
+                    if (indexPosition<position[1]) {
+                        wasPressingButton1 = true;
+                        button1StartTime = new Date();
+                    }
+                }
+                // pressing
+                else {
+                    if (indexPosition<position[1]) {
+                        //milliseconds
+                        console.log(new Date() - button1StartTime)
+                        if ((new Date() - button1StartTime)>(1000)) {
+                            pressActivate1 = true;
+                            wasPressingButton1 = false;
+                        }
+                    }
+                }
+
             }
         }
         else {
             $('.knob1OnButton').css('opacity',1)
         }
 
-    // Knob 2 
+    // Knob 2
 
         if (overlapRect('.circle2', '.cursor')) {
 
@@ -627,18 +942,21 @@ var controller = Leap.loop(function(frame){
             }
         }
 
-        
-        
 
 
-        if (pinchKnob2 && !pinchKnob1) {
+
+
+        if (pinchKnob2 && !otherControlOn(4)) {
 
             //get angle of rotation
+
+            parameterAdjusting = true;
+            wasPinchKnob2 = true;
 
             var angleLimit = 3.14/3
             var handAngle = hand.roll();
 
-            if (handAngle>0) {
+            if (handAngle>.2) {
 
                 if (handAngle<-angleLimit) {
                     knobAngle2=KNOB_SPEED_SCALING*handAngle;
@@ -651,7 +969,7 @@ var controller = Leap.loop(function(frame){
 
 
             }
-            else if (handAngle<0) {
+            else if (handAngle<-.5) {
 
                 if (handAngle>angleLimit) {
                     knobAngle2+=KNOB_SPEED_SCALING*handAngle;
@@ -671,6 +989,9 @@ var controller = Leap.loop(function(frame){
             $('.miniCircle2').css('top', MINICIRCLE2OFFSET_TOP + Math.round(KNOB_RADIUS_OFFSET*Math.sin(knobAngle2 - 3.14/2)));
             $('.circle2').css('opacity', 0.7);
 
+            $('.cursor').css('top', MINICIRCLE2OFFSET_TOP);  //lock onto slider
+            $('.cursor').css('left', MINICIRCLE2OFFSET_LEFT);
+
             if (hand.pinchStrength<.3) { //release
                 pinchKnob2 = false;
                 knob2Highlight = false;
@@ -684,9 +1005,13 @@ var controller = Leap.loop(function(frame){
 
         }
 
+        if (!pinchKnob2 && wasPinchKnob2) {
+            parameterAdjusting = false;
+        }
+
         //normal
         if (!pinchKnob2&& !overlapRect('.circle2', '.cursor'))
-                { $('.circle2').css('opacity', 1);  
+                { $('.circle2').css('opacity', 1);
                 }
 
 
@@ -699,23 +1024,65 @@ var controller = Leap.loop(function(frame){
             $('.knob2OnButton').css('opacity',.4)
 
             if (!effect2On) {
-                if ((keyTapGesture!=false) || (screenTapGesture!=false) || speechButton) {
+                //if ((keyTapGesture!=false) || (screenTapGesture!=false) || speechButton||pressActivate2) {
+                if (speechButton||pressActivate2) {
                     effect2On = true;
+                    knob2Button.dispatchEvent(buttonPress);
                     $('.knob2OnButton').css('background-color', 'magenta');
                     speechButtonActivated = true;
                     speechButton = false;
+                    pressActivate2 = false;
 
+                }
+
+                if (!wasPressingButton2) {
+                    if (indexPosition<position[1]) {
+                        wasPressingButton2 = true;
+                        button2StartTime = new Date();
+                    }
+                }
+                // pressing
+                else {
+                    if (indexPosition<position[1]) {
+                        //milliseconds
+                        //console.log(new Date() - button2StartTime)
+                        if ((new Date() - button2StartTime)>(1000)) {
+                            pressActivate2 = true;
+                            wasPressingButton2 = false;
+                        }
+                    }
                 }
 
             }
             //effect 1 already on
             else {
-                if ((keyTapGesture!=false) || (screenTapGesture!=false) || speechButton) {
+                //if ((keyTapGesture!=false) || (screenTapGesture!=false) || speechButton||pressActivate2) {
+                 if (speechButton||pressActivate2) {
                     effect2On = false;
+                    knob2Button.dispatchEvent(buttonPress);
                     $('.knob2OnButton').css('background-color', 'cyan');
                     speechButtonActivated = true;
                     speechButton = false;
+                    pressActivate2 = false;
 
+                }
+
+                if (!wasPressingButton2) {
+                    if (indexPosition<position[1]) {
+                        wasPressingButton2 = true;
+                        button2StartTime = new Date();
+                    }
+                }
+                // pressing
+                else {
+                    if (indexPosition<position[1]) {
+                        //milliseconds
+                        //console.log(new Date() - button2StartTime)
+                        if ((new Date() - button2StartTime)>(1000)) {
+                            pressActivate2 = true;
+                            wasPressingButton2 = false;
+                        }
+                    }
                 }
             }
         }
@@ -724,7 +1091,7 @@ var controller = Leap.loop(function(frame){
         }
 
 
-//Knob 3 
+//Knob 3
 
 if (overlapRect('.circle3', '.cursor')) {
 
@@ -740,18 +1107,21 @@ if (overlapRect('.circle3', '.cursor')) {
             }
         }
 
-        
-        
 
 
-        if (pinchKnob3) {
+
+
+        if (pinchKnob3 && !otherControlOn(5)) {
 
             //get angle of rotation
+
+            wasPinchKnob3 = true;
+            parameterAdjusting = true;
 
             var angleLimit = 3.14/3
             var handAngle = hand.roll();
 
-            if (handAngle>0) {
+            if (handAngle>.2) {
 
                 if (handAngle<-angleLimit) {
                     knobAngle3=KNOB_SPEED_SCALING*handAngle;
@@ -763,7 +1133,7 @@ if (overlapRect('.circle3', '.cursor')) {
 
 
             }
-            else if (handAngle<0) {
+            else if (handAngle<-.5) {
 
                 //knobAngle1+=.02;
                 if (handAngle>angleLimit) {
@@ -781,6 +1151,11 @@ if (overlapRect('.circle3', '.cursor')) {
             $('.miniCircle3').css('top', MINICIRCLE3OFFSET_TOP + Math.round(KNOB_RADIUS_OFFSET*Math.sin(knobAngle3 - 3.14/2)));
             $('.circle3').css('opacity', 0.7);
 
+            $('.cursor').css('top', MINICIRCLE3OFFSET_TOP);  //lock onto slider
+            $('.cursor').css('left', MINICIRCLE3OFFSET_LEFT);
+
+            updateBitValue(knobAngle3);
+
             if (hand.pinchStrength<.3) { //release
                 pinchKnob3 = false;
 
@@ -791,11 +1166,15 @@ if (overlapRect('.circle3', '.cursor')) {
 
         }
 
+        if (!pinchKnob3 && wasPinchKnob3) {
+            parameterAdjusting = false;
+        }
+
 
         knobElement3.dispatchEvent(bitEvent);
         //normal
         if (!pinchKnob3&& !overlapRect('.circle3', '.cursor'))
-                { $('.circle3').css('opacity', 1);  
+                { $('.circle3').css('opacity', 1);
                 }
 
 
@@ -806,23 +1185,65 @@ if (overlapRect('.circle3', '.cursor')) {
             $('.knob3OnButton').css('opacity',.4)
 
             if (!effect3On) {
-                if ((keyTapGesture!=false) || (screenTapGesture!=false) || speechButton) {
+                //if ((keyTapGesture!=false) || (screenTapGesture!=false) || speechButton || pressActivate3) {
+                if (speechButton || pressActivate3) {
                     effect3On = true;
+                    knob3Button.dispatchEvent(buttonPress);
                     $('.knob3OnButton').css('background-color', 'magenta');
                     speechButtonActivated = true;
                     speechButton = false;
+                    pressActivate3 = false;
 
+                }
+
+                if (!wasPressingButton3) {
+                    if (indexPosition<position[1]) {
+                        wasPressingButton3 = true;
+                        button3StartTime = new Date();
+                    }
+                }
+                // pressing
+                else {
+                    if (indexPosition<position[1]) {
+                        //milliseconds
+                        //console.log(new Date() - button2StartTime)
+                        if ((new Date() - button3StartTime)>(1000)) {
+                            pressActivate3 = true;
+                            wasPressingButton3 = false;
+                        }
+                    }
                 }
 
             }
             //effect 3 already on
             else {
-                if ((keyTapGesture!=false) || (screenTapGesture!=false) || speechButton) {
+                //if ((keyTapGesture!=false) || (screenTapGesture!=false) || speechButton || pressActivate3) {
+                if (speechButton || pressActivate3) {
                     effect3On = false;
+                    knob3Button.dispatchEvent(buttonPress);
                     $('.knob3OnButton').css('background-color', 'cyan');
                     speechButtonActivated = true;
                     speechButton = false;
+                    pressActivate3 = false;
 
+                }
+
+                if (!wasPressingButton3) {
+                    if (indexPosition<position[1]) {
+                        wasPressingButton3 = true;
+                        button3StartTime = new Date();
+                    }
+                }
+                // pressing
+                else {
+                    if (indexPosition<position[1]) {
+                        //milliseconds
+                        //console.log(new Date() - button2StartTime)
+                        if ((new Date() - button3StartTime)>(1000)) {
+                            pressActivate3 = true;
+                            wasPressingButton3 = false;
+                        }
+                    }
                 }
             }
         }
@@ -836,14 +1257,14 @@ if (overlapRect('.circle3', '.cursor')) {
 
         //Keyboard logic!
 
-        var nonePressed = true;
-        var blackPressed = false;
 
+        var blackPressed = false;
+        nonePressed = true;
         allSharpKeys.forEach((key, index)=> {
-            if (overlapRect('.cursor', '.' + key.getAttribute('id'))) {
+            if (overlapRect('.cursor', '.' + key.getAttribute('id')) && pianoPressed) {
                 $('.' + key.getAttribute('id')).css('opacity', .5);
                 nonePressed = false;
-                console.log('overlap black key');
+
                 key.dispatchEvent(pianoEvent);
                 blackPressed = true;
             }
@@ -857,7 +1278,7 @@ if (overlapRect('.circle3', '.cursor')) {
 
         allNormalKeys.forEach((key, index)=> {
             if (!blackPressed) { //black keys take priority
-                if (overlapRect('.cursor', '.' + key.getAttribute('id'))) {
+                if (overlapRect('.cursor', '.' + key.getAttribute('id')) && pianoPressed) {
                     $('.' + key.getAttribute('id')).css('opacity', .5);
                     nonePressed = false;
                     key.dispatchEvent(pianoEvent);
@@ -881,6 +1302,41 @@ if (overlapRect('.circle3', '.cursor')) {
 
 
 
+        //Reverb button
+
+        if (overlapRect('.reverbButton', '.cursor')) {
+
+            $('.reverbButton').css('opacity',.4)
+
+            if (!reverbOn) {
+                if ((keyTapGesture!=false) || (screenTapGesture!=false) || speechButton) {
+                    reverbOn = true;
+                    document.getElementById('reverbButton').dispatchEvent(buttonPress);
+                    $('.reverbButton').css('background-color', 'magenta');
+                    speechButtonActivated = true;
+                    speechButton = false;
+
+                }
+
+            }
+            //effect reverb already on
+            else {
+                if ((keyTapGesture!=false) || (screenTapGesture!=false) || speechButton) {
+                    reverbOn = false;
+                   document.getElementById('reverbButton').dispatchEvent(buttonPress);
+                    $('.reverbButton').css('background-color', 'cyan');
+                    speechButtonActivated = true;
+                    speechButton = false;
+                }
+            }
+        }
+        else {
+            $('.reverbButton').css('opacity',1)
+        }
+
+
+
+
 
 
 
@@ -890,6 +1346,20 @@ if (overlapRect('.circle3', '.cursor')) {
 
 
 
+function otherControlOn(index) {
+    if (index==1) {
+        return pinchSlide2||pinchKnob1||pinchKnob2||pinchKnob3;
+    }
+    else if (index==2)
+        return pinchSlide1||pinchKnob1||pinchKnob2||pinchKnob3;
+    else if (index==3)
+        return pinchSlide1||pinchSlide2||pinchKnob2||pinchKnob3;
+    else if (index==4)
+        return pinchSlide1||pinchSlide2||pinchKnob1||pinchKnob3;
+    else if (index==5)
+        return pinchSlide1||pinchSlide2||pinchKnob1||pinchKnob2;
+}
+
 
 function overlapRect(obj1, obj2) {
 
@@ -897,9 +1367,9 @@ function overlapRect(obj1, obj2) {
                 var elem2 = document.querySelector(obj2);
                 var rect1 = elem1.getBoundingClientRect();
                 var rect2 = elem2.getBoundingClientRect();
-                var overlappingTest = !(rect1.right < rect2.left || 
-                rect1.left > rect2.right || 
-                rect1.bottom < rect2.top || 
+                var overlappingTest = !(rect1.right < rect2.left ||
+                rect1.left > rect2.right ||
+                rect1.bottom < rect2.top ||
                 rect1.top > rect2.bottom);
 
                 return overlappingTest;
@@ -941,6 +1411,7 @@ function newVolume2Value() {
 
 function updateFilter(value) {
     newCutoffFreq = value;
+    document.getElementById('knob1label').innerHTML = "Filter: " + String(Math.round(newCutoffFreq));
 
 }
 
@@ -949,7 +1420,8 @@ function newFilterValue() {
 }
 
 function updatePanValue() {
-    newPanValue = -Math.cos(angleValue(2));
+    newPanValue = -Math.cos((3.14/2)+angleValue(2));
+    document.getElementById('knob2label').innerHTML = "Pan: " + String(newPanValue.toFixed(2));
 }
 
 function getPanValue() {
@@ -975,6 +1447,18 @@ function bitValue() {
     return Math.round((8/3)*knobAngle3+3);
 
 }
+
+function updateBitValue() {
+
+    newBitValue = Math.round((8/3)*knobAngle3+3);
+    document.getElementById('knob3label').innerHTML = "Bit: " + String(newBitValue);
+}
+
+function currentBitValue() {
+    return newBitValue;
+}
+
+
 
 
 
@@ -1016,6 +1500,19 @@ function bitCrusherEffect(context, numBits) {
     return node;
 }
 
+function reverbEffect(audioContext) {
+    var convolver = audioContext.createConvolver(),
+        noiseBuffer = audioContext.createBuffer(2, 0.5 * audioContext.sampleRate, audioContext.sampleRate),
+        left = noiseBuffer.getChannelData(0),
+        right = noiseBuffer.getChannelData(1);
+    for (var i = 0; i < noiseBuffer.length; i++) {
+        left[i] = Math.random() * 2 - 1;
+        right[i] = Math.random() * 2 - 1;
+    }
+    convolver.buffer = noiseBuffer;
+    return convolver;
+}
+
 
 var sineaOn = false;
 var sinea = false;
@@ -1026,12 +1523,13 @@ var pannerOptions;
 var panner;
 var compressor;
 var bitNode;
+var reverbNode;
 
 
 var sourcem83 = false;
 sineButton = document.getElementById('playButton1');
 var m83Ctx = false;
-m83Button = document.querySelector('audio');
+m83Button = document.getElementById("audio_player");
 m83Button.crossOrigin = "anonymous";
 
 
@@ -1044,15 +1542,15 @@ var volumeSinea;
 
 
 function audioPlayListener() {
-    console.log('1');
-    console.log(m83Ctx);
+
+
     if (m83Ctx==false) {console.log('path');
         m83Ctx = new (window.AudioContext || window.webkitAudioContext)();}
-    console.log('2');
+
     if (!sourcem83) {
-        console.log('3');
+
         sourcem83 = m83Ctx.createMediaElementSource(m83Button);
-        console.log('4')
+
         gainNode = m83Ctx.createGain();
 
 
@@ -1068,7 +1566,7 @@ function audioPlayListener() {
         sinea = m83Ctx.createOscillator();
         volumeSinea = m83Ctx.createGain();
 
-        volumeSinea.gain.value = 0;
+        volumeSinea.gain.value = .7;
         volumeSinea.connect(m83Ctx.destination);
         sinea.frequency.value = 440;
         sinea.type = "sine";
@@ -1078,6 +1576,7 @@ function audioPlayListener() {
         sinea.start();
 
         bitNode = bitCrusherEffect(m83Ctx, bitValue());
+        reverbNode = reverbEffect(m83Ctx);
        // volumeSinea.connect(m83Ctx.destination);
 
 
@@ -1105,18 +1604,21 @@ function audioPlayListener() {
 
     }
 
+    //key pressing logic
+    if (nonePressed) {
+        sineAConnected = false;
+        volumeSinea.disconnect(m83Ctx.destination);
+    }
 
     // Create a gain node
 
     compressor.threshold.value = -50;
     compressor.knee.value = 40;
 
-
-
     filterM83.frequency.value = 10000;
 
     handleElement1.addEventListener('volumeChange', ()=> {
-        console.log(newVolume);
+
         gainNode.gain.value = newVolumeValue();
     })
 
@@ -1129,7 +1631,7 @@ function audioPlayListener() {
 
 
     handleElement2.addEventListener('volume2Change', ()=> {
-        console.log(newVolume2Value());
+
         volumeSinea.gain.value = newVolume2Value();
         //compressor.threshold.value = newCompressionReductionValue;
     })
@@ -1138,24 +1640,24 @@ function audioPlayListener() {
     //wave events
 
     handleElement2.addEventListener('sineEvent', ()=> {
-        console.log('sine');
+
         sinea.type = 'sine';
         //compressor.threshold.value = newCompressionReductionValue;
     })
     handleElement2.addEventListener('squareEvent', ()=> {
-        console.log('square');
+
         sinea.type = 'square';
         //compressor.threshold.value = newCompressionReductionValue;
     })
 
     handleElement2.addEventListener('sawtoothEvent', ()=> {
-        console.log('sawtooth');
+
         sinea.type = 'sawtooth';
         //compressor.threshold.value = newCompressionReductionValue;
     })
 
     handleElement2.addEventListener('triangleEvent', ()=> {
-        console.log('triangle');
+
         sinea.type = 'triangle';
         //compressor.threshold.value = newCompressionReductionValue;
     })
@@ -1176,13 +1678,13 @@ function audioPlayListener() {
     })
 
     knobElement3.addEventListener('bitChange', ()=>{
-        console.log(bitValue());
+
         bitNode.bits = bitValue();
     });
 
     allNormalKeys.forEach((key)=> {
         key.addEventListener('keyPress', () => {
-            console.log('key ' + key.getAttribute('id'));
+
             sinea.frequency.value = frequencyDict[key.getAttribute('id')];
             volumeSinea.connect(m83Ctx.destination);
             sineAConnected = true;
@@ -1190,7 +1692,7 @@ function audioPlayListener() {
     });
     allSharpKeys.forEach((key)=>{
         key.addEventListener('keyPress', ()=>{
-            console.log('key ' + key.getAttribute('id'));
+
             sinea.frequency.value = frequencyDict[key.getAttribute('id')];
             volumeSinea.connect(m83Ctx.destination);
             sineAConnected = true;
@@ -1218,6 +1720,51 @@ function audioPlayListener() {
     });
 
 
+    //button presses
+    knob1Button.addEventListener('buttonPress', ()=>{
+        sourcem83.connect(filterM83);
+        filterM83.connect(panner);
+        panner.connect(gainNode);
+        // compressor.connect(gainNode);
+
+        gainNode.connect(bitNode);
+        bitNode.connect(m83Ctx.destination);
+        connectLogic();
+    })
+
+    knob2Button.addEventListener('buttonPress', ()=>{
+        sourcem83.connect(filterM83);
+        filterM83.connect(panner);
+        panner.connect(gainNode);
+        // compressor.connect(gainNode);
+
+        gainNode.connect(bitNode);
+        bitNode.connect(m83Ctx.destination);
+        connectLogic();
+    })
+    knob3Button.addEventListener('buttonPress', ()=>{
+        sourcem83.connect(filterM83);
+        filterM83.connect(panner);
+        panner.connect(gainNode);
+        // compressor.connect(gainNode);
+
+        gainNode.connect(bitNode);
+        bitNode.connect(m83Ctx.destination);
+        connectLogic();
+    })
+
+    document.getElementById('reverbButton').addEventListener('buttonPress', ()=>{
+        sourcem83.connect(filterM83);
+        filterM83.connect(panner);
+        panner.connect(gainNode);
+        // compressor.connect(gainNode);
+
+        gainNode.connect(bitNode);
+        bitNode.connect(m83Ctx.destination);
+        connectLogic();
+    })
+
+
 
 
 
@@ -1229,19 +1776,34 @@ function audioPlayListener() {
     gainNode.connect(bitNode);
     bitNode.connect(m83Ctx.destination);
 
+    connectLogic();
     //sinea
     //volumeSinea.connect(m83Ctx.destination);
 
+
+}
+
+
+function connectLogic() {
     if (effect1On && effect2On && effect3On) {
         sourcem83.connect(filterM83);
         filterM83.connect(panner);
         panner.connect(gainNode);
-       // compressor.connect(gainNode);
+        // compressor.connect(gainNode);
 
         gainNode.connect(bitNode);
-        bitNode.connect(m83Ctx.destination);
+        //bitNode.connect(m83Ctx.destination);
+
+        if (reverbOn) {
+            bitNode.connect(reverbNode)
+            reverbNode.connect(m83Ctx.destination);
+        }
+        else {
+            bitNode.connect(m83Ctx.destination);
+        }
 
         //sinea
+        if (sineAConnected)
         volumeSinea.connect(m83Ctx.destination);
 
     }
@@ -1255,9 +1817,18 @@ function audioPlayListener() {
         // compressor.connect(gainNode);
 
         gainNode.connect(bitNode);
-        bitNode.connect(m83Ctx.destination);
+       // bitNode.connect(m83Ctx.destination);
+
+        if (reverbOn) {
+            bitNode.connect(reverbNode)
+            reverbNode.connect(m83Ctx.destination);
+        }
+        else {
+            bitNode.connect(m83Ctx.destination);
+        }
 
         //sinea
+        if (sineAConnected)
         volumeSinea.connect(m83Ctx.destination);
 
     }
@@ -1268,9 +1839,18 @@ function audioPlayListener() {
         sourcem83.connect(gainNode);
 
         gainNode.connect(bitNode);
-        bitNode.connect(m83Ctx.destination);
+      //  bitNode.connect(m83Ctx.destination);
+
+        if (reverbOn) {
+            bitNode.connect(reverbNode)
+            reverbNode.connect(m83Ctx.destination);
+        }
+        else {
+            bitNode.connect(m83Ctx.destination);
+        }
 
         //sinea
+        if (sineAConnected)
         volumeSinea.connect(m83Ctx.destination);
 
     }
@@ -1285,9 +1865,22 @@ function audioPlayListener() {
         gainNode.disconnect(bitNode);
         bitNode.disconnect(m83Ctx.destination);
 
+     //   sourcem83.connect(reverbNode);
         sourcem83.connect(gainNode);
-       gainNode.connect(m83Ctx.destination);
+      //  reverbNode.connect(gainNode);
+       // gainNode.connect(m83Ctx.destination);
 
+        if (reverbOn) {
+            gainNode.connect(reverbNode)
+            reverbNode.connect(m83Ctx.destination);
+            console.log('reverb');
+        }
+        else {
+            gainNode.connect(m83Ctx.destination);
+        }
+
+
+        if (sineAConnected)
         volumeSinea.connect(m83Ctx.destination);
 
     }
@@ -1303,26 +1896,46 @@ function audioPlayListener() {
         gainNode.connect(bitNode);
         bitNode.connect(m83Ctx.destination);
 
+        if (reverbOn) {
+            bitNode.connect(reverbNode)
+            reverbNode.connect(m83Ctx.destination);
+        }
+        else {
+            bitNode.connect(m83Ctx.destination);
+        }
+
         //sinea
+        if (sineAConnected)
         volumeSinea.connect(m83Ctx.destination);
 
     }
 
     if (effect1On && !effect2On && !effect3On) {
-        sourcem83.connect(filterM83);
 
         filterM83.disconnect(panner);
-        panner.disconnect(gainNode);
+        //sourcem83.connect(filterM83);
 
+        console.log('connection?')
+        panner.disconnect(gainNode);
+        console.log(filterM83.frequency.value);
         filterM83.connect(gainNode);
 
 
         gainNode.disconnect(bitNode);
         bitNode.disconnect(m83Ctx.destination);
 
-        gainNode.connect(m83Ctx.destination);
+     //   gainNode.connect(m83Ctx.destination);
+
+        if (reverbOn) {
+            gainNode.connect(reverbNode)
+            reverbNode.connect(m83Ctx.destination);
+        }
+        else {
+            gainNode.connect(m83Ctx.destination);
+        }
 
         //sinea
+        if (sineAConnected)
         volumeSinea.connect(m83Ctx.destination);
 
     }
@@ -1336,10 +1949,19 @@ function audioPlayListener() {
         gainNode.disconnect(bitNode);
         bitNode.disconnect(m83Ctx.destination);
 
-        gainNode.connect(m83Ctx.destination);
+      //  gainNode.connect(m83Ctx.destination);
+
+        if (reverbOn) {
+            gainNode.connect(reverbNode)
+            reverbNode.connect(m83Ctx.destination);
+        }
+        else {
+            gainNode.connect(m83Ctx.destination);
+        }
+
 
         //sinea
-
+        if (sineAConnected)
         volumeSinea.connect(m83Ctx.destination);
 
     }
@@ -1357,15 +1979,21 @@ function audioPlayListener() {
 
 
 
-        gainNode.connect(m83Ctx.destination);
+        //gainNode.connect(m83Ctx.destination);
+
+        if (reverbOn) {
+            gainNode.connect(reverbNode)
+            reverbNode.connect(m83Ctx.destination);
+        }
+        else {
+            gainNode.connect(m83Ctx.destination);
+        }
+
         //sinea
+        if (sineAConnected)
         volumeSinea.connect(m83Ctx.destination);
 
     }
-
-
-
-
 
 
 }
@@ -1385,6 +2013,7 @@ function speechPauseActivate() {
 }
 
 function otherTrackPauseListener() {
+    if (sineAConnected)
     volumeSinea.disconnect(m83Ctx.destination);
 }
 
@@ -1409,38 +2038,38 @@ var processSpeech = function(transcript) {
     var processed = false;
 
     if (userSaid(transcript, ['play'])) {
-        console.log('play');
+
     //        m83Button.play();
         m83Button.dispatchEvent(speechPlayEvent);
 
     }
 
     if (userSaid(transcript, ['pause'])) {
-        console.log('pause');
+
         m83Button.dispatchEvent(speechPauseEvent);
     }
 
     if (userSaid(transcript, ['volume'])) {
-        console.log('volume');
+
         if (userSaid(transcript, ['up'])) {
-            console.log('up');
+
             speechVolumeUpdate("up");
         }
         else if (userSaid(transcript, ['down'])) {
-            console.log('down');
+
             speechVolumeUpdate("down");
         }
 
     }
 
     if (userSaid(transcript, ['filter'])) {
-        console.log('filter');
+
         if (userSaid(transcript, ['up'])) {
-            console.log('up');
+
             speechFilterUpdate("up");
         }
         else if (userSaid(transcript, ['down'])) {
-            console.log('down');
+
             speechFilterUpdate("down");
         }
 
@@ -1475,16 +2104,29 @@ var processSpeech = function(transcript) {
     //
     // }
     if (userSaid(transcript, ['right'])) {
-                console.log('right');
+
                 speechPanUpdate("right");
             }
     else if (userSaid(transcript, ['left'])) {
-            console.log('left');
+
             speechPanUpdate("left");
         }
 
+//bitcrusher
+    if (userSaid(transcript, ['crush', 'bit', '3', 'three', 'third'])) {
+        if (userSaid(transcript, ['up'])) {
+            speechBitUpdate( 'up');
+
+        }
+        if (userSaid(transcript, ['down'])) {
+            speechBitUpdate( 'down');
+
+        }
+        //        m83Button.play();
 
 
+
+    }
 
 
     if (userSaid(transcript, ['on', 'off'])) {
@@ -1542,10 +2184,10 @@ function speechVolumeUpdate(direction = "up", scale = 50) {
     //$('.handle1').css('background-color', 'blue');
     //  var delta_y = velocity[1]*SLIDER_SPEED_SCALING;
     var volumeDelta = (newTop-(VOLUME_MAX+VOLUME_OFFSET))*(-1/VOLUME_MAX);
-    console.log('delta');
-    console.log(volumeDelta);
+
+
     updateVolume(volumeDelta);
-    console.log(newTop);
+
     //   setVolume(newVolume);
     $('.handle1').css('top', newTop);
 
@@ -1605,4 +2247,29 @@ function speechPanUpdate(direction = "right", scale = .4) {
 
     $('.miniCircle2').css('left', MINICIRCLE2OFFSET_LEFT + Math.round(KNOB_RADIUS_OFFSET*Math.cos(knobAngle2 - 3.14/2)));
     $('.miniCircle2').css('top', MINICIRCLE2OFFSET_TOP + Math.round(KNOB_RADIUS_OFFSET*Math.sin(knobAngle2 - 3.14/2)));
+}
+
+function speechBitUpdate(direction = "up", scale = .4) {
+    //get angle of rotation
+
+
+    if (direction=="up") {
+
+        knobAngle3+=scale;
+
+    }
+    else if (direction = "down") {
+
+        knobAngle3-=scale;
+
+    }
+
+
+    //update pan value
+    updateBitValue(knobAngle3);
+
+    knobElement3.dispatchEvent(bitEvent);
+
+    $('.miniCircle3').css('left', MINICIRCLE3OFFSET_LEFT + Math.round(KNOB_RADIUS_OFFSET*Math.cos(knobAngle3 - 3.14/2)));
+    $('.miniCircle3').css('top', MINICIRCLE3OFFSET_TOP + Math.round(KNOB_RADIUS_OFFSET*Math.sin(knobAngle3 - 3.14/2)));
 }
