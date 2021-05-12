@@ -16,6 +16,28 @@
 // 12. knob (don't move unless angle is above certain value)
 // 13. drum pads
 
+var sourceReverbConnected = false;
+var filterReverbConnected = false;
+var panReverbConnected = false;
+var bitReverbConnected = false;
+
+var sourceConnected = false;
+var filterConnected = false;
+var panConnected = false;
+var bitConnected = false;
+
+var wasSet1 = false;
+var wasSet2 = false;
+var wasSet3 = false;
+var wasSet4 = false;
+var wasSet5 = false;
+var wasSet6 = false;
+var wasSet7 = false;
+var wasSet8 = false;
+var wasReverbOn = false;
+
+
+
 var CURSOR_SPEED_SCALING = .05;
 
 var SLIDER_SPEED_SCALING = .05;
@@ -1054,11 +1076,12 @@ var controller = Leap.loop(function(frame){
                 }
 
             }
-            //effect 1 already on
+            //effect 2 already on
             else {
                 //if ((keyTapGesture!=false) || (screenTapGesture!=false) || speechButton||pressActivate2) {
                  if (speechButton||pressActivate2) {
                     effect2On = false;
+
                     knob2Button.dispatchEvent(buttonPress);
                     $('.knob2OnButton').css('background-color', 'cyan');
                     speechButtonActivated = true;
@@ -1324,7 +1347,7 @@ if (overlapRect('.circle3', '.cursor')) {
                 if ((keyTapGesture!=false) || (screenTapGesture!=false) || speechButton) {
                     reverbOn = false;
                    document.getElementById('reverbButton').dispatchEvent(buttonPress);
-                    $('.reverbButton').css('background-color', 'cyan');
+                    $('.reverbButton').css('background-color', 'forestgreen');
                     speechButtonActivated = true;
                     speechButton = false;
                 }
@@ -1722,45 +1745,21 @@ function audioPlayListener() {
 
     //button presses
     knob1Button.addEventListener('buttonPress', ()=>{
-        sourcem83.connect(filterM83);
-        filterM83.connect(panner);
-        panner.connect(gainNode);
-        // compressor.connect(gainNode);
 
-        gainNode.connect(bitNode);
-        bitNode.connect(m83Ctx.destination);
         connectLogic();
     })
 
     knob2Button.addEventListener('buttonPress', ()=>{
-        sourcem83.connect(filterM83);
-        filterM83.connect(panner);
-        panner.connect(gainNode);
-        // compressor.connect(gainNode);
-
-        gainNode.connect(bitNode);
-        bitNode.connect(m83Ctx.destination);
+        console.log('pressed 2');
         connectLogic();
     })
     knob3Button.addEventListener('buttonPress', ()=>{
-        sourcem83.connect(filterM83);
-        filterM83.connect(panner);
-        panner.connect(gainNode);
-        // compressor.connect(gainNode);
 
-        gainNode.connect(bitNode);
-        bitNode.connect(m83Ctx.destination);
         connectLogic();
     })
 
     document.getElementById('reverbButton').addEventListener('buttonPress', ()=>{
-        sourcem83.connect(filterM83);
-        filterM83.connect(panner);
-        panner.connect(gainNode);
-        // compressor.connect(gainNode);
 
-        gainNode.connect(bitNode);
-        bitNode.connect(m83Ctx.destination);
         connectLogic();
     })
 
@@ -1768,13 +1767,13 @@ function audioPlayListener() {
 
 
 
-    sourcem83.connect(filterM83);
-    filterM83.connect(panner);
-    panner.connect(gainNode);
-    // compressor.connect(gainNode);
-
-    gainNode.connect(bitNode);
-    bitNode.connect(m83Ctx.destination);
+   // sourcem83.connect(gainNode);
+    // filterM83.connect(panner);
+    // panner.connect(gainNode);
+    // // compressor.connect(gainNode);
+    //
+    // gainNode.connect(bitNode);
+    // bitNode.connect(m83Ctx.destination);
 
     connectLogic();
     //sinea
@@ -1785,22 +1784,123 @@ function audioPlayListener() {
 
 
 function connectLogic() {
-    if (effect1On && effect2On && effect3On) {
-        sourcem83.connect(filterM83);
-        filterM83.connect(panner);
-        panner.connect(gainNode);
-        // compressor.connect(gainNode);
 
-        gainNode.connect(bitNode);
-        //bitNode.connect(m83Ctx.destination);
+    if (wasSet1) {
+        wasSet1 = false;
+        if(!wasReverbOn) {
+            bitNode.disconnect(gainNode);
+        }
+    }
+    if (wasSet2) {
+        wasSet2 = false;
+        sourcem83.disconnect(panner);
+       // panner.disconnect(bitNode);
+        if(!wasReverbOn) {
+            bitNode.disconnect(gainNode);
+        }
 
-        if (reverbOn) {
-            bitNode.connect(reverbNode)
-            reverbNode.connect(m83Ctx.destination);
+    }
+
+    if (wasSet3) {
+        wasSet3 = false;
+        sourcem83.disconnect(bitNode);
+
+        if(!wasReverbOn) {
+            bitNode.disconnect(gainNode);
         }
         else {
-            bitNode.connect(m83Ctx.destination);
+            bitNode.disconnect(reverbNode);
         }
+    }
+
+    if(wasSet4) {
+        wasSet4 = false;
+
+        if(!wasReverbOn) {
+            sourcem83.disconnect(gainNode);
+        }
+        else {
+            sourcem83.disconnect(reverbNode);
+        }
+    }
+
+    if(wasSet5) {
+        wasSet5 =false;
+        filterM83.disconnect(bitNode);
+        if(!wasReverbOn) {
+            bitNode.disconnect(gainNode);
+        }
+        else {
+            bitNode.disconnect(reverbNode);
+        }
+    }
+
+    if(wasSet6) {
+        wasSet6 = false;
+
+        if(!wasReverbOn) {
+            filterM83.disconnect(gainNode);
+        }
+        else {
+            filterM83.disconnect(reverbNode);
+        }
+    }
+
+    if(wasSet7) {
+        wasSet7 = false;
+
+        if(!wasReverbOn) {
+            panner.disconnect(gainNode);
+        }
+        else{
+            panner.disconnect(reverbNode);
+        }
+
+    }
+    if (wasSet8) {
+        wasSet8 = false;
+        sourcem83.disconnect(panner);
+
+
+        if(!wasReverbOn) {
+            panner.disconnect(gainNode);
+        }
+        else {
+            panner.disconnect(reverbNode);
+        }
+    }
+
+
+
+
+    sourcem83.connect(filterM83);
+    filterM83.connect(panner);
+    panner.connect(bitNode);
+    bitNode.connect(reverbNode);
+    reverbNode.connect(gainNode);
+    // compressor.connect(gainNode);
+
+
+    gainNode.connect(m83Ctx.destination);
+
+    if (effect1On && effect2On && effect3On) { //set 1
+        // sourcem83.connect(filterM83);
+        // filterM83.connect(panner);
+        // panner.connect(gainNode);
+        // compressor.connect(gainNode);
+        //
+        // gainNode.connect(bitNode);
+        //bitNode.connect(m83Ctx.destination);
+        wasReverbOn = true;
+        if (!reverbOn) {
+           reverbNode.disconnect(gainNode)
+           bitNode.disconnect(reverbNode);
+            //reverbNode.connect(m83Ctx.destination);
+            bitNode.connect(gainNode);
+            wasReverbOn = false;
+        }
+
+        wasSet1 = true;
 
         //sinea
         if (sineAConnected)
@@ -1808,46 +1908,48 @@ function connectLogic() {
 
     }
 
-    if (!effect1On && effect2On && effect3On) {
+    if (!effect1On && effect2On && effect3On) { //set 2
         sourcem83.disconnect(filterM83);
         filterM83.disconnect(panner);
         sourcem83.connect(panner);
 
-        panner.connect(gainNode);
+        panner.connect(bitNode);
         // compressor.connect(gainNode);
 
-        gainNode.connect(bitNode);
+
        // bitNode.connect(m83Ctx.destination);
-
-        if (reverbOn) {
-            bitNode.connect(reverbNode)
-            reverbNode.connect(m83Ctx.destination);
+        wasReverbOn = true;
+        if (!reverbOn) {
+            reverbNode.disconnect(gainNode)
+            bitNode.disconnect(reverbNode);
+            //reverbNode.connect(m83Ctx.destination);
+            bitNode.connect(gainNode);
+            wasReverbOn = false;
         }
-        else {
-            bitNode.connect(m83Ctx.destination);
-        }
 
+        wasSet2 = true;
         //sinea
         if (sineAConnected)
         volumeSinea.connect(m83Ctx.destination);
 
     }
 
-    if (!effect1On && !effect2On && effect3On) {
+    if (!effect1On && !effect2On && effect3On) { //set 3
         sourcem83.disconnect(filterM83);
         filterM83.disconnect(panner);
-        sourcem83.connect(gainNode);
+        sourcem83.connect(bitNode);
 
-        gainNode.connect(bitNode);
+        //bitNode.connect(bitNode);
       //  bitNode.connect(m83Ctx.destination);
+        wasReverbOn = true;
+        wasSet3 = true;
+        if (!reverbOn) {
+            bitNode.disconnect(reverbNode)
+            reverbNode.disconnect(gainNode);
+            bitNode.connect(gainNode);
+            wasReverbOn = false;
+        }
 
-        if (reverbOn) {
-            bitNode.connect(reverbNode)
-            reverbNode.connect(m83Ctx.destination);
-        }
-        else {
-            bitNode.connect(m83Ctx.destination);
-        }
 
         //sinea
         if (sineAConnected)
@@ -1855,28 +1957,28 @@ function connectLogic() {
 
     }
 
-    if (!effect1On && !effect2On && !effect3On) {
+    if (!effect1On && !effect2On && !effect3On) { //set 4
         console.log('all off');
         sourcem83.disconnect(filterM83);
         filterM83.disconnect(panner);
-        panner.disconnect(gainNode);
-
-
-        gainNode.disconnect(bitNode);
-        bitNode.disconnect(m83Ctx.destination);
+        panner.disconnect(bitNode);
+        bitNode.disconnect(reverbNode);
+        sourcem83.connect(reverbNode);
+        //bitNode.disconnect(m83Ctx.destination);
 
      //   sourcem83.connect(reverbNode);
-        sourcem83.connect(gainNode);
+       // sourcem83.connect(gainNode);
       //  reverbNode.connect(gainNode);
        // gainNode.connect(m83Ctx.destination);
 
-        if (reverbOn) {
-            gainNode.connect(reverbNode)
-            reverbNode.connect(m83Ctx.destination);
-            console.log('reverb');
-        }
-        else {
-            gainNode.connect(m83Ctx.destination);
+        wasReverbOn = true;
+        wasSet4 = true;
+        if (!reverbOn) {
+            reverbNode.disconnect(gainNode);
+            sourcem83.disconnect(reverbNode);
+            sourcem83.connect(gainNode);
+            wasReverbOn = false;
+            //gainNode.connect(m83Ctx.destination);
         }
 
 
@@ -1885,23 +1987,23 @@ function connectLogic() {
 
     }
 
-    if (effect1On && !effect2On && effect3On) {
-        sourcem83.connect(filterM83);
+    if (effect1On && !effect2On && effect3On) { //set 5
+       // sourcem83.connect(filterM83);
         filterM83.disconnect(panner);
-        panner.disconnect(gainNode);
-        filterM83.connect(gainNode);
+        panner.disconnect(bitNode);
+        filterM83.connect(bitNode);
 
         // compressor.connect(gainNode);
 
-        gainNode.connect(bitNode);
-        bitNode.connect(m83Ctx.destination);
-
-        if (reverbOn) {
-            bitNode.connect(reverbNode)
-            reverbNode.connect(m83Ctx.destination);
-        }
-        else {
-            bitNode.connect(m83Ctx.destination);
+        //gainNode.connect(bitNode);
+        //bitNode.connect(m83Ctx.destination);
+        wasReverbOn = true;
+        wasSet5 = true;
+        if (!reverbOn) {
+            bitNode.disconnect(reverbNode)
+            reverbNode.disconnect(gainNode);
+            bitNode.connect(gainNode);
+            wasReverbOn = false
         }
 
         //sinea
@@ -1910,28 +2012,30 @@ function connectLogic() {
 
     }
 
-    if (effect1On && !effect2On && !effect3On) {
+    if (effect1On && !effect2On && !effect3On) { //set 6
 
         filterM83.disconnect(panner);
         //sourcem83.connect(filterM83);
 
-        console.log('connection?')
-        panner.disconnect(gainNode);
-        console.log(filterM83.frequency.value);
-        filterM83.connect(gainNode);
+       // console.log('connection?')
+        panner.disconnect(bitNode);
+        bitNode.disconnect(reverbNode);
+      //  console.log(filterM83.frequency.value);
+        filterM83.connect(reverbNode);
+
+        wasReverbOn = true;
+        wasSet6 = true;
 
 
-        gainNode.disconnect(bitNode);
-        bitNode.disconnect(m83Ctx.destination);
+       // bitNode.disconnect(m83Ctx.destination);
 
      //   gainNode.connect(m83Ctx.destination);
 
-        if (reverbOn) {
-            gainNode.connect(reverbNode)
-            reverbNode.connect(m83Ctx.destination);
-        }
-        else {
-            gainNode.connect(m83Ctx.destination);
+        if (!reverbOn) {
+            filterM83.disconnect(reverbNode);
+            reverbNode.disconnect(gainNode);
+            filterM83.connect(gainNode);
+            wasReverbOn = false;
         }
 
         //sinea
@@ -1940,23 +2044,25 @@ function connectLogic() {
 
     }
 
-    if (effect1On && effect2On && !effect3On) {
+    if (effect1On && effect2On && !effect3On) { //set 7
         sourcem83.connect(filterM83);
 
         filterM83.connect(panner);
-        panner.connect(gainNode);
+        panner.disconnect(bitNode);
+        bitNode.disconnect(reverbNode);
+        panner.connect(reverbNode);
 
-        gainNode.disconnect(bitNode);
-        bitNode.disconnect(m83Ctx.destination);
 
+
+        wasReverbOn = true;
+        wasSet7 = true;
       //  gainNode.connect(m83Ctx.destination);
 
-        if (reverbOn) {
-            gainNode.connect(reverbNode)
-            reverbNode.connect(m83Ctx.destination);
-        }
-        else {
-            gainNode.connect(m83Ctx.destination);
+        if (!reverbOn) {
+            panner.disconnect(reverbNode);
+            reverbNode.disconnect(gainNode);
+            panner.connect(gainNode);
+            wasReverbOn = false;
         }
 
 
@@ -1966,27 +2072,27 @@ function connectLogic() {
 
     }
 
-    if (!effect1On && effect2On && !effect3On) {
+    if (!effect1On && effect2On && !effect3On) { //set 8
         sourcem83.disconnect(filterM83);
         filterM83.disconnect(panner);
 
         sourcem83.connect(panner);
-        panner.disconnect(gainNode);
-        gainNode.disconnect(bitNode);
-        bitNode.disconnect(m83Ctx.destination);
+        panner.disconnect(bitNode);
+        bitNode.disconnect(reverbNode);
+        panner.connect(reverbNode);
 
-        panner.connect(gainNode);
+        //panner.connect(gainNode);
 
 
-
+        wasReverbOn = true;
+        wasSet8 = true;
         //gainNode.connect(m83Ctx.destination);
 
-        if (reverbOn) {
-            gainNode.connect(reverbNode)
-            reverbNode.connect(m83Ctx.destination);
-        }
-        else {
-            gainNode.connect(m83Ctx.destination);
+        if (!reverbOn) {
+            panner.disconnect(reverbNode);
+            reverbNode.disconnect(gainNode);
+            panner.connect(gainNode);
+            wasReverbOn = false;
         }
 
         //sinea
