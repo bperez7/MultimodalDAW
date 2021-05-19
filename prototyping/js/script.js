@@ -1,31 +1,16 @@
-// variable to store HTML5 audio element
+//Globals
+// var sourceReverbConnected = false;
+// var filterReverbConnected = false;
+// var panReverbConnected = false;
+// var bitReverbConnected = false;
+//
+// var sourceConnected = false;
+// var filterConnected = false;
+// var panConnected = false;
+// var bitConnected = false;
 
-//TODO
-// 1. Keyboard :-)
-// 2. Voice commands for buttons done :-)
-// 3. Different shapes for keyboard (voice command) :-)
-// 4. Live response for buttons
-// 5. Size and spacing :-)
-// 5. Labels :-)
-// 6. Finish voice commands
-// 7. Improve calibration/smoothing
-// 8. Record option
-// 9. Upload personal file :-)
-// 10. Reset buttons?
-// 11. Legend :-)
-// 12. knob (don't move unless angle is above certain value)
-// 13. drum pads
 
-var sourceReverbConnected = false;
-var filterReverbConnected = false;
-var panReverbConnected = false;
-var bitReverbConnected = false;
-
-var sourceConnected = false;
-var filterConnected = false;
-var panConnected = false;
-var bitConnected = false;
-
+//For audio logic
 var wasSet1 = false;
 var wasSet2 = false;
 var wasSet3 = false;
@@ -38,6 +23,7 @@ var wasReverbOn = false;
 
 
 
+//Cursor parameters
 var CURSOR_SPEED_SCALING = .05;
 
 var SLIDER_SPEED_SCALING = .05;
@@ -56,7 +42,7 @@ var BOTTOM_OF_SCREEN = 900
 var RIGHT_SIDE_OF_SCREEN = 1500
 
 
-
+//Control positions
 var VOLUME_MAX = 500;
 var VOLUME_OFFSET = 200;
 
@@ -83,8 +69,21 @@ var allNormalKeys = [];
 var allSharpKeys = [];
 
 
+//More parameter globals
+var parameterAdjusting = false; //for only adjusting one parameter at a time
+var wasPinchSlide1 = false;
+var wasPinchSlide2 = false;
+var wasPinchKnob1 = false;
+var wasPinchKnob2 = false;
+var wasPinchKnob3 = false;
 
 
+var pressActivate1 = false;
+var pressActivate2 = false;
+var pressActivate3 = false;
+
+
+//keyboard setup
 for (var x = 0; x < noteLetters.length; x++)
 {
     var c = noteLetters.charAt(x);
@@ -114,66 +113,39 @@ document.getElementById("upload").addEventListener("change", handleFiles, false)
 
 var music = document.getElementById('audio_player');
   
-function playAudio() {
-  if (music.paused) {
-    music.play();
-    pButton.className = "";
-    pButton.className = "pause";
-  } else {
-    music.pause();
-    pButton.className = "";
-    pButton.className = "play";
-  }
-}
+// function playAudio() {
+//   if (music.paused) {
+//     music.play();
+//     pButton.className = "";
+//     pButton.className = "pause";
+//   } else {
+//     music.pause();
+//     pButton.className = "";
+//     pButton.className = "play";
+//   }
+// }
 
-
-function setVolume(volume) {
-   music.volume = volume;
-
-}
-
-
-
-
-
-
-//Audio Prototyping
-
-
-//window.Wad = Wad;
-//let m83 = new Wad({source : 'https://github.com/bperez7/outbreak/blob/master/assets/title_tune_1.wav'});
-
-
-//function playTrack1() {
-//    m83.play();
-//}
-//Play Button 1
-
-//$('.play1').click(playTrack1());
+//
+// function setVolume(volume) {
+//    music.volume = volume;
+//
+// }
 
 
 
 
-var parameterAdjusting = false; //for only adjusting one parameter at a time
-var wasPinchSlide1 = false;
-var wasPinchSlide2 = false;
-var wasPinchKnob1 = false;
-var wasPinchKnob2 = false;
-var wasPinchKnob3 = false;
-
-
-var pressActivate1 = false;
-var pressActivate2 = false;
-var pressActivate3 = false;
 
 
 
 
-var $cursor = $('.cursor');
 
+
+
+
+//set color of header
 $('h1').css('color', 'black');
 
-var testing = true
+
 
 //slider and knob booleans
 var pinchSlide1 = false;
@@ -182,7 +154,7 @@ var pinchSlide3 = false;
 
 
 
-
+//Effect objects/booleans/parameters
 var nonePressed = true;
 
 var handleElement1 = document.getElementById('handle1');
@@ -234,6 +206,8 @@ var reverbOn = false;
 
 var newCompressionReductionValue = 0;
 
+
+//Events
 let volumeEvent = new CustomEvent('volumeChange');
 let volume2Event = new CustomEvent('volume2Change');
 
@@ -258,7 +232,7 @@ let buttonPress = new CustomEvent("buttonPress");
 
 
 
-
+//Smoothing window
 
 var sineAConnected = false;
 
@@ -272,7 +246,7 @@ for (let i = 0; i<SMOOTHING_WINDOW_SIZE; i++ ) {
 }
 
 
-
+//keyboard frequencies
 var frequencyDict = {};
 
 frequencyDict['c-key'] = 261.63;
@@ -289,18 +263,17 @@ frequencyDict['a-sharp-key'] = 466.16;
 frequencyDict['b-key'] = 493.88;
 frequencyDict['c2-key'] = 523.25;
 
-// allNormalKeys.forEach((key), ()=> {
-//     keyID = key.getAttribute('id');
-//     frequencyDict[keyID]
-// })
 
 
 
+//booleans for keyboard gestures/index finger
 
 var screenTapGesture = false;
 var keyTapGesture = false;
 var indexPosition = false;
 
+
+//Main loop for leap controller
 var controller = Leap.loop(function(frame){
 
     screenTapGesture = false;
@@ -335,100 +308,8 @@ var controller = Leap.loop(function(frame){
     // add left hand functionality
     if (frame.hands.length > 0)
     {
-        // if (frame.hands.length>1) {
-        //     if (frame.hands[0].type=="left") {
-        //         leftHand = frame.hands[0];
-        //         rightHand = frame.hands[1];
-        //     }
-        //     else {
-        //         leftHand = frame.hands[1];
-        //         rightHand = frame.hands[0];
-        //
-        //     }
-        //
-        //     //left hand
-        //
-        //
-        //
-        //     var leftPosition = leftHand.palmPosition;
-        //     var leftVelocity = leftHand.palmVelocity;
-        //     var leftDirection = leftHand.direction;
-        //
-        //     var newLeftHandLeft = Math.round(leftPosition[0]*POSITION_SCALING);
-        //     var newLeftHandTop = Math.round(leftPosition[1]*POSITION_SCALING);
-        //
-        //     var cursorLeftVelocityX = leftVelocity[0];
-        //     var cursorLeftVelocityY = leftVelocity[1];
-        //
-        //     var currentLeftX = parseInt($('.cursor2').css('left'));
-        //     var currentLeftY = parseInt($('.cursor2').css('top'));
-        //
-        //     var newLeftX = currentLeftX + cursorLeftVelocityX*CURSOR_SPEED_SCALING;
-        //     var newLeftY = currentLeftY - cursorLeftVelocityY*CURSOR_SPEED_SCALING;
-        //
-        //
-        //     //BORDER CASES
-        //     if (newLeftX<0) {
-        //         newLeftX = 0;
-        //     }
-        //     if (newLeftX> RIGHT_SIDE_OF_SCREEN) {
-        //         newLeftX = RIGHT_SIDE_OF_SCREEN;
-        //     }
-        //     if (newLeftY<0) {
-        //         newLeftY = 0;
-        //     }
-        //     if (newLeftY>BOTTOM_OF_SCREEN) {
-        //         newLeftY = BOTTOM_OF_SCREEN;
-        //     }
-        //
-        //     //SET position
-        //     $('.cursor2').css('left', Math.round(newLeftX));
-        //     $('.cursor2').css('top', Math.round(newLeftY));
-        //
-        //
-        //     //right hand
-        //     var rightPosition = rightHand.palmPosition;
-        //     var rightVelocity = rightHand.palmVelocity;
-        //     var rightDirection = rightHand.direction;
-        //
-        //     var newRightHandLeft = Math.round(rightPosition[0]*POSITION_SCALING);
-        //     var newRightHandTop = Math.round(rightPosition[1]*POSITION_SCALING);
-        //
-        //     var cursorRightVelocityX = rightVelocity[0];
-        //     var cursorRightVelocityY = rightVelocity[1];
-        //
-        //     var currentRightX = parseInt($('.cursor').css('left'));
-        //     var currentRightY = parseInt($('.cursor').css('top'));
-        //
-        //     var newRightX = currentRightX + cursorRightVelocityX*CURSOR_SPEED_SCALING;
-        //     var newRightY = currentRightY - cursorRightVelocityY*CURSOR_SPEED_SCALING;
-        //
-        //
-        //     //BORDER CASES
-        //     if (newRightX<0) {
-        //         newRightX = 0;
-        //     }
-        //     if (newRightX> RIGHT_SIDE_OF_SCREEN) {
-        //         newRightX = RIGHT_SIDE_OF_SCREEN;
-        //     }
-        //     if (newRightY<0) {
-        //         newRightY = 0;
-        //     }
-        //     if (newRightY>BOTTOM_OF_SCREEN) {
-        //         newRightY = BOTTOM_OF_SCREEN;
-        //     }
-        //
-        //     //SET position
-        //     $('.cursor').css('left', Math.round(newRightX));
-        //     $('.cursor').css('top', Math.round(newRightY));
-        //
-        //
-        //     //temporary
-        //     var hand = rightHand;
-        //     var position = rightPosition;
-        //
-        // }
-       // else { // only one hand
+
+       //currently only one hand
             var twoHands = false;
             if (frame.hands.length>1) {
                 twoHands = true;
@@ -471,7 +352,7 @@ var controller = Leap.loop(function(frame){
             var newSmoothXSum = smoothArrayX.reduce(function(a,b) {return a+b});
             var newSmoothYSum = smoothArrayY.reduce(function(a,b) {return a+b});
 
-
+            //for smoothing version of cursor
            // newX = (newSmoothXSum/SMOOTHING_WINDOW_SIZE);
            // newY = (newSmoothYSum/SMOOTHING_WINDOW_SIZE);
 
@@ -555,9 +436,6 @@ var controller = Leap.loop(function(frame){
         var slider1RightHand = true;
         if (overlapRect('.handle1', '.cursor')) {
             $('.handle1').css('background-color', 'blue');
-
-
-
 
 
             //check pinching
@@ -725,66 +603,7 @@ var controller = Leap.loop(function(frame){
 
 
 
-//slider 3
 
-        // if (overlapRect('.handle3', '.cursor')) {
-        //     $('.handle3').css('background-color', 'blue');
-        //
-        //
-        //     //check pinching
-        //
-        //     if (hand.pinchStrength<.4) {
-        //             pinchSlide3 = false;
-        //         }
-        //     else {
-        //         pinchSlide3 = true;
-        //     }
-        // }
-        //
-        // if (pinchSlide3) {
-        //
-        //
-        //     var newTop;
-        //
-        //     if (velocity[1] > 0) {
-        //         var currentTop = parseInt($('.handle3').css('top'));
-        //         var delta_y = velocity[1]*SLIDER_SPEED_SCALING;
-        //
-        //         //newTop = currentTop+delta_y;
-        //         if (currentTop<205){//upper limit
-        //             newTop = 205;
-        //         }
-        //         else {
-        //             newTop = currentTop-delta_y;
-        //         }
-        //
-        //     }
-        //     else {
-        //         var currentTop = parseInt($('.handle3').css('top'))
-        //         var delta_y = velocity[1]*SLIDER_SPEED_SCALING;
-        //
-        //         if (currentTop>650) {//height of bar, limit
-        //             newTop = 650;
-        //         }
-        //         else {
-        //             newTop = currentTop-delta_y;
-        //         }
-        //     }
-        //
-        //         //check release
-        //         if (hand.pinchStrength<.4) {
-        //             pinchSlide3 = false
-        //         }
-        //
-        //         $('.handle3').css('background-color', 'blue');
-        //
-        //         $('.handle3').css('top', newTop);
-        //
-        // }
-        //
-        // if (!overlapRect('.handle3', '.cursor') && !pinchSlide3) {
-        //     $('.handle3').css('background-color', 'red');
-        // }
 
 // Knob 1
 
@@ -1367,8 +1186,10 @@ if (overlapRect('.circle3', '.cursor')) {
 });
 
 
+//Functions
 
 
+//when other control is being adjusted
 function otherControlOn(index) {
     if (index==1) {
         return pinchSlide2||pinchKnob1||pinchKnob2||pinchKnob3;
@@ -1400,7 +1221,7 @@ function overlapRect(obj1, obj2) {
 
 
 
-
+//returns value of angle of indicated knob
 function angleValue(knobIndex) {
     if (knobIndex == 1) {
         var result = knobAngle1;
@@ -1537,9 +1358,9 @@ function reverbEffect(audioContext) {
 }
 
 
-var sineaOn = false;
-var sinea = false;
 
+
+//Nodes for each effect
 var gainNode;
 var filterM83;
 var pannerOptions;
@@ -1600,30 +1421,7 @@ function audioPlayListener() {
 
         bitNode = bitCrusherEffect(m83Ctx, bitValue());
         reverbNode = reverbEffect(m83Ctx);
-       // volumeSinea.connect(m83Ctx.destination);
 
-
-
-
-        //filterA.connect(audioCtx.destination);
-
-        // async function createReverb() {
-        //     let convolver = audioCtx.createConvolver();
-        //
-        //     // load impulse response from file
-        //     let response     = await fetch("path/to/impulse-response.wav");
-        //     let arraybuffer  = await response.arrayBuffer();
-        //     convolver.buffer = await audioCtx.decodeAudioData(arraybuffer);
-        //
-        //     return convolver;
-        // }
-
-
-        // let reverb = await createReverb();
-
-// someOtherAudioNode -> reverb -> destination
-      //  someOtherAudioNode.connect(reverb);
-      //  reverb.connect(audioCtx.destination);
 
     }
 
@@ -1656,7 +1454,7 @@ function audioPlayListener() {
     handleElement2.addEventListener('volume2Change', ()=> {
 
         volumeSinea.gain.value = newVolume2Value();
-        //compressor.threshold.value = newCompressionReductionValue;
+
     })
 
 
@@ -1665,24 +1463,24 @@ function audioPlayListener() {
     handleElement2.addEventListener('sineEvent', ()=> {
 
         sinea.type = 'sine';
-        //compressor.threshold.value = newCompressionReductionValue;
+
     })
     handleElement2.addEventListener('squareEvent', ()=> {
 
         sinea.type = 'square';
-        //compressor.threshold.value = newCompressionReductionValue;
+
     })
 
     handleElement2.addEventListener('sawtoothEvent', ()=> {
 
         sinea.type = 'sawtooth';
-        //compressor.threshold.value = newCompressionReductionValue;
+
     })
 
     handleElement2.addEventListener('triangleEvent', ()=> {
 
         sinea.type = 'triangle';
-        //compressor.threshold.value = newCompressionReductionValue;
+
     })
 
 
@@ -1722,16 +1520,12 @@ function audioPlayListener() {
 
         })
 
-        // key.addEventListener('keyRelease', ()=> {
-        //     console.log('key ' + key.getAttribute('id'));
-        //    // volumeSinea.disconnect(m83Ctx.destination);
-        //     //sinea.frequency.value = 0;
-        // })
+
     });
 
     //when no keys are pressed
     handleElement2.addEventListener('keyRelease', ()=> {
-        //console.log(newCompressionReductionValue);
+
 
 
         if (sineAConnected) {
@@ -1739,7 +1533,7 @@ function audioPlayListener() {
             volumeSinea.disconnect(m83Ctx.destination);
 
         }
-        //compressor.threshold.value = newCompressionReductionValue;
+
     });
 
 
@@ -1767,22 +1561,14 @@ function audioPlayListener() {
 
 
 
-   // sourcem83.connect(gainNode);
-    // filterM83.connect(panner);
-    // panner.connect(gainNode);
-    // // compressor.connect(gainNode);
-    //
-    // gainNode.connect(bitNode);
-    // bitNode.connect(m83Ctx.destination);
 
     connectLogic();
-    //sinea
-    //volumeSinea.connect(m83Ctx.destination);
+
 
 
 }
 
-
+//Goes through each case for audio effects
 function connectLogic() {
 
     if (wasSet1) {
@@ -1964,12 +1750,7 @@ function connectLogic() {
         panner.disconnect(bitNode);
         bitNode.disconnect(reverbNode);
         sourcem83.connect(reverbNode);
-        //bitNode.disconnect(m83Ctx.destination);
 
-     //   sourcem83.connect(reverbNode);
-       // sourcem83.connect(gainNode);
-      //  reverbNode.connect(gainNode);
-       // gainNode.connect(m83Ctx.destination);
 
         wasReverbOn = true;
         wasSet4 = true;
@@ -1978,7 +1759,7 @@ function connectLogic() {
             sourcem83.disconnect(reverbNode);
             sourcem83.connect(gainNode);
             wasReverbOn = false;
-            //gainNode.connect(m83Ctx.destination);
+
         }
 
 
@@ -1993,10 +1774,6 @@ function connectLogic() {
         panner.disconnect(bitNode);
         filterM83.connect(bitNode);
 
-        // compressor.connect(gainNode);
-
-        //gainNode.connect(bitNode);
-        //bitNode.connect(m83Ctx.destination);
         wasReverbOn = true;
         wasSet5 = true;
         if (!reverbOn) {
@@ -2015,21 +1792,16 @@ function connectLogic() {
     if (effect1On && !effect2On && !effect3On) { //set 6
 
         filterM83.disconnect(panner);
-        //sourcem83.connect(filterM83);
 
-       // console.log('connection?')
         panner.disconnect(bitNode);
         bitNode.disconnect(reverbNode);
-      //  console.log(filterM83.frequency.value);
+
         filterM83.connect(reverbNode);
 
         wasReverbOn = true;
         wasSet6 = true;
 
 
-       // bitNode.disconnect(m83Ctx.destination);
-
-     //   gainNode.connect(m83Ctx.destination);
 
         if (!reverbOn) {
             filterM83.disconnect(reverbNode);
@@ -2056,7 +1828,7 @@ function connectLogic() {
 
         wasReverbOn = true;
         wasSet7 = true;
-      //  gainNode.connect(m83Ctx.destination);
+
 
         if (!reverbOn) {
             panner.disconnect(reverbNode);
@@ -2081,12 +1853,10 @@ function connectLogic() {
         bitNode.disconnect(reverbNode);
         panner.connect(reverbNode);
 
-        //panner.connect(gainNode);
-
 
         wasReverbOn = true;
         wasSet8 = true;
-        //gainNode.connect(m83Ctx.destination);
+
 
         if (!reverbOn) {
             panner.disconnect(reverbNode);
@@ -2110,6 +1880,8 @@ m83Button.addEventListener('pause', otherTrackPauseListener);
 m83Button.addEventListener('speechPlay', speechPlayActivate);
 m83Button.addEventListener('speechPause', speechPauseActivate);
 
+
+//Speech functions
 function speechPlayActivate() {
     m83Button.play();
 }
@@ -2145,7 +1917,7 @@ var processSpeech = function(transcript) {
 
     if (userSaid(transcript, ['play'])) {
 
-    //        m83Button.play();
+
         m83Button.dispatchEvent(speechPlayEvent);
 
     }
@@ -2197,18 +1969,7 @@ var processSpeech = function(transcript) {
         handleElement2.dispatchEvent(sawtoothEvent);
 
     }
-    // if (userSaid(transcript, ['pain','pan'])) {
-    //     console.log('pan');
-    //     if (userSaid(transcript, ['right'])) {
-    //         console.log('right');
-    //         speechPanUpdate("right");
-    //     }
-    //     else if (userSaid(transcript, ['left'])) {
-    //         console.log('left');
-    //         speechPanUpdate("left");
-    //     }
-    //
-    // }
+
     if (userSaid(transcript, ['right'])) {
 
                 speechPanUpdate("right");
@@ -2228,7 +1989,7 @@ var processSpeech = function(transcript) {
             speechBitUpdate( 'down');
 
         }
-        //        m83Button.play();
+
 
 
 
@@ -2240,10 +2001,6 @@ var processSpeech = function(transcript) {
         speechButton = true;
 
     }
-    // else if (userSaid(transcript, ['on'])) {
-    //
-    //     if (!speechButtonActivated)
-    // }
 
     else {
         speechButton = false;
@@ -2251,29 +2008,13 @@ var processSpeech = function(transcript) {
     }
 
 
-    //
-    // if (userSaid(transcript, ['stop'])) {
-    //     console.log('')
-    // }
 
-    /*if (userSaid(transcript, ['fire'])) {
-        registerPlayerShot();
-
-
-        processed = true;
-
-    }*/
     return transcript;
-    //return processed;
+
 };
 
-//console.log(processSpeech('hello'));
 
-//export processSpeech
 
-function turnOnButton1() {
-
-}
 
 
 function speechVolumeUpdate(direction = "up", scale = 50) {
@@ -2287,14 +2028,12 @@ function speechVolumeUpdate(direction = "up", scale = 50) {
         var newTop = 205;
 
 
-    //$('.handle1').css('background-color', 'blue');
-    //  var delta_y = velocity[1]*SLIDER_SPEED_SCALING;
     var volumeDelta = (newTop-(VOLUME_MAX+VOLUME_OFFSET))*(-1/VOLUME_MAX);
 
 
     updateVolume(volumeDelta);
 
-    //   setVolume(newVolume);
+
     $('.handle1').css('top', newTop);
 
 

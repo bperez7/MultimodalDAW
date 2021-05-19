@@ -4,44 +4,22 @@
 	<link rel="stylesheet" href="css/main.css"> 
 </head>
 
-
+<!-- Libraries -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script type="text/javascript" src="lib/leap.min.js"></script>
+<script type="text/javascript" src="lib/jquery.min.js"></script>
+<script type="text/javascript" src="lib/underscore.min.js"></script>
+
+
+<!-- audio source-->
 <input type="file" id="upload" />
 <audio id="audio_player" controls>
     <source src="" id="src" />
 </audio>
-<!--
-<audio controls="controls" id="audio_player" crossorigin="anonymous">
-  
-  <source src="audio/m83.mp3" type="audio/mpeg" />
-  Audio
-</audio>
-
--->
-
-
-<!-- play button
-<div class="play1" id="playButton1">
-  &#9654; 
-</div>
--->
-
- <!-- Leap -->
-<!-- <script type="text/javascript" src="lib/leap-plugins.min.js"></script> -->
- <script type="text/javascript" src="lib/leap.min.js"></script>
-
- <!-- jquery -->
- <script type="text/javascript" src="lib/jquery.min.js"></script>
-  <script type="text/javascript" src="lib/jquery.rotate.1-1.js"></script>
-  <script type="text/javascript" src="lib/jqueryrotate.js"></script>
-  <script src="https://unpkg.com/web-audio-daw"></script>
-
-<script type="text/javascript" src="lib/underscore.min.js"></script>
-
 
 
  
-<h1 > Multimodal DAW V.0.9 </h1>
+<h1 > Multimodal DAW V.1.1 </h1>
 
 
 <body>
@@ -81,19 +59,6 @@
 <div class = "cursor"></div>
 
 
-<!--
-<div id="audioplayer" style="border: 1px solid black">
-  <button id="pButton" class="play" onclick="playAudio()"></button>
-    <div id="timeline">
-    <div id="playhead"></div>
-  </div>
--->
-
-<!--  <div id="volume_control">
-    <label id="rngVolume_label" for="rngVolume">Volume:</label>
-    <input type="range" onchange="setVolume(this.value)" id="rngVolume" min="0" max="1" step="0.01" value="1">
-  </div>
--->
  
 </div>
 
@@ -111,12 +76,7 @@
 <div class="slider2label" id = "slider2label">
  Synth Volume
 </div>
-<!--
- <div class = "slider3"></div>
- <div class = "handle3"></div>
--->
 
-<!-- <img class="knob1" src = "imgs/knob1.png"> --> 
 <div class="circle1" id ="knob1"></div>
 <div class="miniCircle1"></div>
 <div class="knob1OnButton" id = "knob1OnButton"></div>
@@ -139,6 +99,10 @@
 
 <div class="reverbButton" id = "reverbButton"></div>
 
+<div class="reverbLabel" id = "reverbLabel">
+ Reverb
+</div>
+
 
 <div class = "c-key" id = "c-key"></div>
 <div class = "c-sharp-key" id = "c-sharp-key"></div>
@@ -159,13 +123,13 @@
 
 <div class = "speechText" id = speechTextBox></div>
 
+
+<!-- Main script -->
 <script src = "js/script.js"></script>
 
 <!-- speech -->
 <script type="text/javascript" src="js/setupSpeech.js"></script>
-<!--
-<script src = "js/webAudioScript.js"></script>
- -->
+
 
 
 </body>
