@@ -21,7 +21,7 @@ One sample track can be found in /audio (m83).
 
 In order to upload personal tracks, a local server must be started and configured. I did this by using the built-in WebStorm server by starting up WebStorm, 
 using it to open up my project files, and opening up http://localhost:63342/MultimodalDaw/prototyping/index.html in my browser (directory name may change depending on setup). 
-I had some trouble with Internet Explorer and Firefox, so I would recommend using Chrome. 
+I had some trouble with Internet Explorer and Firefox, so I would recommend using Chrome. Make sure to always allow access to the microphone. I would also recommend using an external monitor, because if the screen is too small the lower part of the interface will be cut off. 
 
 
 
