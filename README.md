@@ -2,7 +2,7 @@
 
 ## Files
 
-The index html page is located in the main directory. 
+The index html page is located in the main prototyping directory. 
 
 The essential libraries are found in /lib.
 
