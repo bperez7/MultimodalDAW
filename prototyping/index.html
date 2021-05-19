@@ -1,0 +1,137 @@
+<html>
+<head> 
+	<title>Audio Player </title>
+	<link rel="stylesheet" href="css/main.css"> 
+</head>
+
+<!-- Libraries -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script type="text/javascript" src="lib/leap.min.js"></script>
+<script type="text/javascript" src="lib/jquery.min.js"></script>
+<script type="text/javascript" src="lib/underscore.min.js"></script>
+
+
+<!-- audio source-->
+<input type="file" id="upload" />
+<audio id="audio_player" controls>
+    <source src="" id="src" />
+</audio>
+
+
+ 
+<h1 > Multimodal DAW V.1.1 </h1>
+
+
+<body>
+
+
+<div class = "legend" id = "legend">
+ <strong>General Controls</strong>
+ <ul.c>
+
+ <li>Play</li>
+ <li>Pause</li>
+
+ </ul.c>
+ <strong>Effect Controls</strong>
+ <ul.a>
+
+  <li>Volume Up/Down</li>
+  <li>Filter Up/Down</li>
+  <li>Right/Left</li>
+  <li>Bit Up/Down</li>
+  <li>On/Off</li>
+ </ul.a>
+
+
+
+ <strong>Synth Shapes</strong>
+ <ul.b>
+  <li>Sine</li>
+  <li>Square</li>
+  <li>Triangle</li>
+  <li>Sawtooth</li>
+ </ul.b>
+
+</div>
+
+
+<div class = "cursor"></div>
+
+
+ 
+</div>
+
+<!--<div class = "pianoLevel" id = "pianoLevel"> </div> -->
+ <div class="slider1" id = "slider1"></div>
+ <div class="handle1" id = "handle1"></div>
+<div class="slider1label" id = "slider1label">
+ Track Volume
+</div>
+
+
+ <div class = "slider2"></div>
+ <div class = "handle2" id = "handle2"></div>
+
+<div class="slider2label" id = "slider2label">
+ Synth Volume
+</div>
+
+<div class="circle1" id ="knob1"></div>
+<div class="miniCircle1"></div>
+<div class="knob1OnButton" id = "knob1OnButton"></div>
+<div class="knob1label" id = "knob1label">
+ Filter
+</div>
+<div class="circle2" id = "knob2"></div>
+<div class="miniCircle2"></div>
+<div class="knob2OnButton" id = "knob2OnButton"></div>
+<div class="knob2label" id = "knob2label">
+ Panning
+</div>
+
+<div class="circle3" id="knob3"></div>
+<div class="miniCircle3"></div>
+<div class="knob3OnButton" id = "knob3OnButton"></div>
+<div class="knob3label" id = "knob3label">
+ Bit-Crusher
+</div>
+
+<div class="reverbButton" id = "reverbButton"></div>
+
+<div class="reverbLabel" id = "reverbLabel">
+ Reverb
+</div>
+
+
+<div class = "c-key" id = "c-key"></div>
+<div class = "c-sharp-key" id = "c-sharp-key"></div>
+<div class = "d-key" id = "d-key"></div>
+<div class = "d-sharp-key" id = "d-sharp-key"></div>
+<div class = "e-key" id = "e-key"></div>
+<div class = "f-key" id = "f-key"></div>
+<div class = "f-sharp-key" id = "f-sharp-key"></div>
+<div class = "g-key" id = "g-key"></div>
+<div class = "g-sharp-key" id = "g-sharp-key"></div>
+<div class = "a-key" id = "a-key"></div>
+<div class = "a-sharp-key" id = "a-sharp-key"></div>
+<div class = "b-key" id = "b-key"></div>
+<div class = "c2-key" id = "c2-key"></div>
+
+
+
+
+<div class = "speechText" id = speechTextBox></div>
+
+
+<!-- Main script -->
+<script src = "js/script.js"></script>
+
+<!-- speech -->
+<script type="text/javascript" src="js/setupSpeech.js"></script>
+
+
+
+</body>
+
+</html>
