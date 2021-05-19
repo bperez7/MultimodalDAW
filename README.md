@@ -6,6 +6,8 @@ The index html page is located in the main prototyping directory.
 
 The essential libraries are found in /lib.
 
+Note that the leap version is V.2.3 
+
 The main css file can be found in /css. 
 
 The main javascript files can be found in /js, the primary being called "script" and the speech one being called "setupSpeech". 
