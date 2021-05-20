@@ -24,4 +24,12 @@ using it to open up my project files, and opening up http://localhost:63342/Mult
 I had some trouble with Internet Explorer and Firefox, so I would recommend using Chrome. Make sure to always allow access to the microphone. I would also recommend using an external monitor, because if the screen is too small the lower part of the interface will be cut off. 
 
 
+## Tips for use
+
+-	Refresh the page every time you upload a different song
+- If synthesizer is not working, try to adjust its volume
+- Keep your hand flat when pressing buttons, etc
+- When piching and rotating, make sure your hand is pointing into the screen
+
+
 
